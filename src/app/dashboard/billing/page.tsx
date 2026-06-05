@@ -18,7 +18,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/billing/status")
+    fetch("/api/billing/status", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json())
       .then(data => { if (data.plan) setCurrentPlan(data.plan); })
       .catch(() => {});

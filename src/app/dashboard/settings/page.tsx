@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const [twoFALoading, setTwoFALoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json())
       .then(data => {
         if (data.user) {
@@ -32,7 +32,7 @@ export default function SettingsPage() {
         }
       })
       .catch(() => {});
-    fetch("/api/auth/2fa")
+    fetch("/api/auth/2fa", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json())
       .then(data => { if (typeof data.enabled === "boolean") setTwoFAEnabled(data.enabled); })
       .catch(() => {});

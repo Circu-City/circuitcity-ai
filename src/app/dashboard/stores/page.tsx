@@ -17,7 +17,7 @@ export default function DashboardStoresPage() {
   const [adding, setAdding] = useState(false);
 
   const fetchStores = () => {
-    fetch("/api/dashboard/overview")
+    fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json())
       .then(d => {
         const s = d.stores || [];

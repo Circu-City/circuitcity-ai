@@ -11,7 +11,7 @@ export default function ApiKeysPage() {
   const [keyName, setKeyName] = useState("");
 
   useEffect(() => {
-    fetch("/api/dashboard/overview")
+    fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json()).then(d => { setStores(d.stores || []); setLoading(false); })
       .catch(() => { setLoading(false); toast.error("Failed to load data"); });
   }, []);

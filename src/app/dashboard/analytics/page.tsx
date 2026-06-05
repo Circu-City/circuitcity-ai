@@ -10,9 +10,9 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch("/api/dashboard/overview").then(r => r.json()).then(d => {
+    apifetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" }).then(r => r.json()).then(d => {
       setStats(prev => ({ ...prev, stores: d.stores?.length || 0 }));
-      return apiFetch("/api/dashboard/analytics");
+      return apifetch("/api/dashboard/analytics", { ...{ credentials: "include" }, credentials: "include" });
     }).then(r => r.json()).then(d => {
       setStats(prev => ({ ...prev, ...d }));
       setLoading(false);

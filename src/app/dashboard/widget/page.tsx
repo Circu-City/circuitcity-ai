@@ -12,7 +12,7 @@ export default function WidgetPage() {
   const [apiKey, setApiKey] = useState("");
 
   useEffect(() => {
-    fetch("/api/dashboard/widget")
+    fetch("/api/dashboard/widget", { ...{ credentials: "include" }, credentials: "include" })
       .then(r => r.json())
       .then(data => {
         if (data.config) setConfig(data.config);

@@ -15,7 +15,7 @@ export default function ConversationsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dashboard/overview")
+    fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" })
       .then(async r => { if (r.status === 401) { router.push("/login"); return null; } return r.json(); })
       .then(d => { if (d) { setStores(d.stores || []); return fetch("/api/dashboard/conversations?store=" + (storeFilter || "")); } return null; })
       .then(async r => { if (!r || r.status === 401) { router.push("/login"); return []; } return r.json(); })

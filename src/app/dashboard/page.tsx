@@ -18,8 +18,8 @@ export default function DashboardOverview() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/dashboard/overview").then((r) => r.json()),
-      fetch("/api/auth/me").then((r) => r.json()),
+      fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" }).then((r) => r.json()),
+      fetch("/api/auth/me", { ...{ credentials: "include" }, credentials: "include" }).then((r) => r.json()),
     ])
       .then(([dashboardData, userData]) => {
         setData(dashboardData);
