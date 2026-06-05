@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+const allNavItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/stores", label: "Stores", icon: ShoppingBag },
   { href: "/dashboard/api-keys", label: "API Keys", icon: Code },
@@ -19,8 +19,7 @@ const navItems = [
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/support", label: "Support", icon: HeadphonesIcon },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
-  { user?.role === "admin" && { href: "/admin", label: "Admin Panel", icon: Shield } },
-].filter(Boolean) as { href: string; label: string; icon: any }[];
+];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -101,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button className="lg:hidden text-gray-400" onClick={() => setSidebarOpen(false)}><X className="w-5 h-5" /></button>
           </div>
           <nav className="space-y-1">
-            {navItems.map((item) => {
+            {allNavItems.map((item) => {
               const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
               return (
                 <Link
@@ -118,6 +117,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               );
             })}
+            {user?.role === "admin" && (
+              <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-400 hover:text-white hover:bg-white/5">
+                <Shield className="w-5 h-5" /> Admin Panel
+              </Link>
+            )}
           </nav>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-800">
