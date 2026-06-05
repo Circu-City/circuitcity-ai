@@ -63,9 +63,9 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: "Total Users", value: stats?.users ?? 0, icon: Users, href: "/admin/users", color: "bg-blue-500" },
-    { label: "Total Stores", value: stats?.stores ?? 0, icon: Store, href: "#", color: "bg-green-500" },
-    { label: "Subscriptions", value: stats?.subscriptions ?? 0, icon: CreditCard, href: "#", color: "bg-purple-500" },
-    { label: "Conversations", value: stats?.conversations ?? 0, icon: MessageSquare, href: "#", color: "bg-orange-500" },
+    { label: "Total Stores", value: stats?.stores ?? 0, icon: Store, href: "/admin/stores", color: "bg-green-500" },
+    { label: "Subscriptions", value: stats?.subscriptions ?? 0, icon: CreditCard, href: "/admin/stores", color: "bg-purple-500" },
+    { label: "Conversations", value: stats?.conversations ?? 0, icon: MessageSquare, href: "/admin/support", color: "bg-orange-500" },
   ];
 
   return (
@@ -113,22 +113,22 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-500">View, edit roles, or delete users</p>
               <p className="text-xs text-lemon-green font-semibold mt-2">{stats?.users} users →</p>
             </Link>
-            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm opacity-70">
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3">
+            <Link href="/admin/stores" className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <ShoppingBag className="w-6 h-6 text-green-600" />
               </div>
               <h3 className="font-semibold text-dark-navy mb-1">Manage Stores</h3>
               <p className="text-sm text-gray-500">View and manage all stores</p>
-              <p className="text-xs text-gray-400 font-semibold mt-2">Coming soon</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm opacity-70">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
+              <p className="text-xs text-lemon-green font-semibold mt-2">{stats?.stores} stores →</p>
+            </Link>
+            <Link href="/admin/support" className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <TicketCheck className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="font-semibold text-dark-navy mb-1">Support Tickets</h3>
               <p className="text-sm text-gray-500">View and respond to tickets</p>
-              <p className="text-xs text-gray-400 font-semibold mt-2">Coming soon</p>
-            </div>
+              <p className="text-xs text-lemon-green font-semibold mt-2">View tickets →</p>
+            </Link>
           </div>
         </div>
 
