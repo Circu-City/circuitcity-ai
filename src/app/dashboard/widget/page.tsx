@@ -107,6 +107,7 @@ export default function WidgetPage() {
                 <p className="text-xs text-gray-400 mt-1">Go to <a href="/dashboard/api-keys" className="text-lemon-green hover:underline">API Keys</a> if this takes too long.</p>
               </div>
             ) : (
+            <>
             <div className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto relative">
               <code className="whitespace-pre-wrap break-all">{embedCode}</code>
               <button onClick={copyCode} className="absolute top-2 right-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
@@ -119,7 +120,9 @@ export default function WidgetPage() {
               <h3 className="font-semibold text-dark-navy mb-1">Your Unique Store ID</h3>
               <p className="text-sm text-gray-500">The API key is pre-configured in this code. Just paste it into your website.</p>
             </div>
+            </>
             )}
+          </div>
           </div>
         </div>
       </div>
