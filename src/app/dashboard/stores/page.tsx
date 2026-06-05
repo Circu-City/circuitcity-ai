@@ -1,25 +1,28 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Plus, ExternalLink, Copy, Trash2, Store } from "lucide-react";
+import { Plus, ExternalLink, Copy, Store } from "lucide-react";
 import Link from "next/link";
+import crypto from "crypto";
+import { revalidatePath } from "next/cache";
+
+async function createStoreAction(formData: FormData) {
+  "use server";
+  const { requireAuth } = await import("@/lib/auth");
+  const { prisma: p } = await import("@/lib/prisma");
+  const user = await requireAuth();
+  const name = formData.get("name") as string;
+  const url = formData.get("url") as string;
+  if (!name || !url) return;
+  const apiKey = "cc_live_" + crypto.randomBytes(16).toString("hex");
+  await p.store.create({ data: { userId: user.userId, name, url, apiKey, status: "active" } });
+  revalidatePath("/dashboard/stores");
+  redirect("/dashboard/stores");
+}
 
 export default async function DashboardStoresPage() {
   const user = await requireAuth();
-  if (!user) redirect("/login");
-
-  const stores = await prisma.store.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
-
-  async function createStore(formData: FormData) {
-    "use server";
-    const name = formData.get("name") as string;
-    const url = formData.get("url") as string;
-    if (!name || !url) return;
-    const crypto = require("crypto");
-    const apiKey = "cc_live_" + crypto.randomBytes(16).toString("hex");
-    await prisma.store.create({ data: { userId: user.id, name, url, apiKey, status: "active" } });
-    redirect("/dashboard/stores");
-  }
+  const stores = await prisma.store.findMany({ where: { userId: user.userId }, orderBy: { createdAt: "desc" } });
 
   return (
     <div>
@@ -28,7 +31,7 @@ export default async function DashboardStoresPage() {
           <h1 className="text-3xl font-bold text-dark-navy">Stores</h1>
           <p className="text-gray-500 mt-1">Manage your connected e-commerce stores</p>
         </div>
-        <form action={createStore} className="flex gap-3">
+        <form action={createStoreAction} className="flex gap-3">
           <input name="name" placeholder="Store Name" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
           <input name="url" placeholder="https://mystore.com" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
           <button type="submit" className="bg-lemon-gradient text-dark-navy font-bold px-5 py-2 rounded-xl text-sm hover:opacity-90 flex items-center gap-2"><Plus className="w-4 h-4" /> Add Store</button>
@@ -54,7 +57,7 @@ export default async function DashboardStoresPage() {
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${store.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{store.status}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1 rounded-lg">{store.apiKey?.substring(0, 16)}...</span>
+                <span className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1 rounded-lg">{store.apiKey?.substring(0, 20)}...</span>
                 <button onClick={() => navigator.clipboard.writeText(store.apiKey || "")} className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><Copy className="w-4 h-4" /></button>
                 <Link href={`/dashboard/stores/${store.id}`} className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><ExternalLink className="w-4 h-4" /></Link>
               </div>

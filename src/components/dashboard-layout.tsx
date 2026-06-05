@@ -19,8 +19,8 @@ const navItems = [
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/support", label: "Support", icon: HeadphonesIcon },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
-  { href: "/admin", label: "Admin Panel", icon: Shield },
-];
+  { user?.role === "admin" && { href: "/admin", label: "Admin Panel", icon: Shield } },
+].filter(Boolean) as { href: string; label: string; icon: any }[];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
