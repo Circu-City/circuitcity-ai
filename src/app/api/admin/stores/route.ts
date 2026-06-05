@@ -19,3 +19,22 @@ export async function GET() {
     })));
   } catch (e) { return NextResponse.json([], { status: 200 }); }
 }
+
+export async function DELETE(req: Request) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+  await prisma.store.delete({ where: { id } });
+  return NextResponse.json({ success: true });
+}
+
+export async function PUT(req: Request) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { id, status } = await req.json();
+  if (!id || !status) return NextResponse.json({ error: "id and status required" }, { status: 400 });
+  await prisma.store.update({ where: { id }, data: { status } });
+  return NextResponse.json({ success: true });
+}
