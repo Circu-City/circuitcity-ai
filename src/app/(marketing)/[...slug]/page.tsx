@@ -8,8 +8,10 @@ const pages: Record<string, { title: string; desc: string }> = {
   security: { title: "Security", desc: "Enterprise-grade security measures protecting your store and customer data." },
 };
 
-export default function Page({ params }: { params: { slug: string[] } }) {
-  const page = pages[params.slug[0]];
+export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = await params;
+  const key = slug?.[0] || "";
+  const page = pages[key];
 
   return (
     <div className="pt-32 pb-20 px-6">
