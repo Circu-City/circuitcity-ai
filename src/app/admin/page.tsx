@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Users, Store, CreditCard, MessageSquare, LogOut, Bot, Shield, UserCog, ShoppingBag, TicketCheck } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api-client";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/stats", { credentials: "include" })
+    apiFetch("/api/admin/stats")
+      .then(r => r.json())
       .then(async r => {
         if (r.status === 401) {
           // Try to re-auth - user might need to login

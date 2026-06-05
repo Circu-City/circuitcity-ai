@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, TicketCheck, MessageSquare, Mail, Search } from "lucide-react";
-import { toast } from "sonner";
+import { apiFetch } from "@/lib/api-client";
 
 export default function AdminSupportPage() {
   const router = useRouter();
@@ -13,8 +13,8 @@ export default function AdminSupportPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/admin/support", { credentials: "include" })
-      .then(async r => { if (r.status === 401) { router.push("/login"); return []; } return r.json(); })
+    apiFetch("/api/admin/support")
+      .then(r => r.json())
       .then(data => { setTickets(data || []); setLoading(false); })
       .catch(() => { setLoading(false); });
   }, [router]);

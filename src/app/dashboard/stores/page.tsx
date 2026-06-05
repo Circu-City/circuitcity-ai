@@ -6,6 +6,7 @@ import { Plus, ExternalLink, Copy, Store } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/dashboard-layout";
+import { apiFetch } from "@/lib/api-client";
 
 export default function DashboardStoresPage() {
   const router = useRouter();
