@@ -21,25 +21,25 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "py-3 bg-white/90 backdrop-blur-xl shadow-sm" : "py-5 bg-transparent"}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "py-3 bg-white/95 backdrop-blur-md shadow-sm" : "py-5 bg-dark-navy/95 backdrop-blur-md"}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
           <div className="w-10 h-10 bg-lemon-gradient rounded-xl flex items-center justify-center shadow-lemon">
             <Bot className="text-dark-navy w-6 h-6" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-dark-navy">
-            CircuitCity<span className="text-lemon-green">AI</span>
+          <span className={`text-2xl font-bold tracking-tight ${scrolled ? "text-dark-navy" : "text-white"}`}>
+            CircuCity<span className="text-lemon-green"> AI</span>
           </span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <NavDropdown label="Product" items={["Features", "Pricing", "Documentation", "API"]} />
-          <NavDropdown label="Company" items={["About Us", "Blog", "Careers", "Contact"]} />
-          <NavDropdown label="Legal" items={["Privacy", "Terms", "GDPR", "Security"]} />
+          <NavDropdown label="Product" items={["Features", "Pricing", "Documentation", "API"]} scrolled={scrolled} />
+          <NavDropdown label="Company" items={["About Us", "Blog", "Careers", "Contact"]} scrolled={scrolled} />
+          <NavDropdown label="Legal" items={["Privacy", "Terms", "GDPR", "Security"]} scrolled={scrolled} />
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <button onClick={() => router.push("/login")} className="px-5 py-2.5 rounded-lg font-semibold text-dark-navy hover:bg-gray-100 transition-colors">
+          <button onClick={() => router.push("/login")} className={`px-5 py-2.5 rounded-lg font-semibold transition-colors ${scrolled ? "text-dark-navy hover:bg-gray-100" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
             Log In
           </button>
           <button onClick={() => router.push("/signup")} className="px-5 py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy hover:opacity-90 shadow-lemon transition-all">
@@ -74,10 +74,10 @@ function Navbar() {
   );
 }
 
-function NavDropdown({ label, items }: { label: string; items: string[] }) {
+function NavDropdown({ label, items, scrolled }: { label: string; items: string[]; scrolled: boolean }) {
   return (
     <div className="group relative cursor-pointer">
-      <span className="text-sm font-medium text-gray-600 group-hover:text-dark-navy transition-colors flex items-center gap-1">
+      <span className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-600 group-hover:text-dark-navy" : "text-white/70 group-hover:text-white"}`}>
         {label} <ChevronDown className="w-3 h-3" />
       </span>
       <div className="absolute top-full left-0 pt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all translate-y-2 group-hover:translate-y-0">
@@ -106,7 +106,7 @@ function HeroSection() {
             <div className="inline-flex items-center rounded-full border mb-6 px-4 py-1.5 bg-lemon-green/20 text-lemon-green border-lemon-green/30 font-semibold text-sm tracking-wide">
               ✨ AI-Powered E-commerce Revolution
             </div>
-            <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight">
+            <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.15] mb-6 tracking-tight">
               Turn Visitors into <br />
               <span className="text-lemon-green italic">Loyal Customers</span> <br />
               with AI Chat.
@@ -132,7 +132,7 @@ function HeroSection() {
                     <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                     <div className="w-3 h-3 rounded-full bg-green-500/50" />
                   </div>
-                  <div className="mx-auto bg-white/10 rounded-md px-3 py-1 text-[10px] text-gray-400 w-1/2 text-center">circuitcity-store.com/shop</div>
+                  <div className="mx-auto bg-white/10 rounded-md px-3 py-1 text-[10px] text-gray-400 w-1/2 text-center">CircuCity-store.com/shop</div>
                 </div>
                 <div className="p-6 h-[350px] bg-gradient-to-b from-dark-navy to-[#111d35] relative">
                   <div className="grid grid-cols-2 gap-4">
@@ -188,7 +188,7 @@ function FeaturesSection() {
             Supercharge Your Store's <span className="text-lemon-green italic">Conversion</span>
           </h2>
           <p className="text-gray-500 text-lg leading-relaxed">
-            Stop losing customers to slow support. CircuitCity AI provides instant, accurate, and personalized shopping experiences that drive sales.
+            Stop losing customers to slow support. CircuCity AI provides instant, accurate, and personalized shopping experiences that drive sales.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
@@ -295,13 +295,13 @@ function CTASection() {
             <span className="text-lemon-green">Customer Support?</span>
           </h2>
           <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
-            Join 2,000+ stores increasing their conversion rates by an average of 24% using CircuitCity AI.
+            Join 2,000+ stores increasing their conversion rates by an average of 24% using CircuCity AI.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-10 py-5 rounded-xl text-xl hover:scale-105 transition-transform shadow-lemon flex items-center gap-2">
               Start Free Trial Now <ArrowRight className="w-6 h-6" />
             </button>
-            <button className="border-2 border-white/20 text-white px-10 py-5 rounded-xl text-xl font-medium hover:bg-white/10 backdrop-blur-sm transition-all">
+            <button onClick={() => router.push("/book-demo")} className="border-2 border-white/20 text-white px-10 py-5 rounded-xl text-xl font-medium hover:bg-white/10 backdrop-blur-sm transition-all">
               Book a Demo
             </button>
           </div>
@@ -321,7 +321,7 @@ function Footer() {
             <div className="w-10 h-10 bg-lemon-gradient rounded-xl flex items-center justify-center">
               <Bot className="text-dark-navy w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-white">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-xl font-bold text-white">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
           <p className="text-sm leading-relaxed">AI-powered customer support for modern e-commerce stores.</p>
         </div>
@@ -341,7 +341,7 @@ function Footer() {
         ))}
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 text-sm text-center">
-        © 2026 CircuitCity AI. All rights reserved.
+        © 2026 CircuCity AI. All rights reserved.
       </div>
     </footer>
   );

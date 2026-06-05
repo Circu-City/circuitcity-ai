@@ -54,7 +54,7 @@ export default function SignupPage() {
             <div className="w-12 h-12 bg-lemon-gradient rounded-xl flex items-center justify-center shadow-lemon">
               <Bot className="text-dark-navy w-7 h-7" />
             </div>
-            <span className="text-2xl font-bold">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-2xl font-bold">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
           <div className="max-w-md">
             <h2 className="text-4xl font-bold mb-6 leading-tight">Start your AI-powered customer support journey</h2>
@@ -68,7 +68,7 @@ export default function SignupPage() {
             </ul>
           </div>
         </div>
-        <div className="relative z-10 text-sm text-gray-500">© 2026 CircuitCity AI. All rights reserved.</div>
+        <div className="relative z-10 text-sm text-gray-500">© 2026 CircuCity AI. All rights reserved.</div>
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
@@ -77,7 +77,7 @@ export default function SignupPage() {
             <div className="w-10 h-10 bg-lemon-gradient rounded-xl flex items-center justify-center">
               <Bot className="text-dark-navy w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-dark-navy">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-xl font-bold text-dark-navy">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
           <h1 className="text-3xl font-bold text-dark-navy mb-2">Create your account</h1>
           <p className="text-gray-500 mb-8">Start your 14-day free trial. No credit card needed.</p>

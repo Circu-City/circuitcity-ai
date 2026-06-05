@@ -8,9 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export function generateEmbedCode(apiKey: string, storeId: string): string {
   return `<script>
   (function(w,d,s,o,f){
-    w.CircuitCityAI=o;w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
+    w.CircuCity AI=o;w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
     f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;
-    j.src='https://chatbot.circuitcity.se/widget.js';
+    j.src='https://chatbot.CircuCity.se/widget.js';
     j.dataset.storeId='${storeId}';
     j.dataset.apiKey='${apiKey}';
     f.parentNode.insertBefore(j,f);

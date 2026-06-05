@@ -5,6 +5,11 @@
   --color-dark-navy: #0A1428;
   --color-lemon-green-light: #b8f54a;
   --color-lemon-green-dark: #7bcb00;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #9EF01A;
+  --color-background: #ffffff;
+  --color-foreground: #0A1428;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 

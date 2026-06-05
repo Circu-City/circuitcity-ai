@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-lemon-gradient rounded-xl flex items-center justify-center shadow-lemon">
               <Bot className="text-dark-navy w-7 h-7" />
             </div>
-            <span className="text-2xl font-bold">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-2xl font-bold">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
           <div className="max-w-md">
             <h2 className="text-4xl font-bold mb-6 leading-tight">Welcome back to your AI-powered store</h2>
@@ -65,7 +65,7 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="relative z-10 text-sm text-gray-500">
-          © 2026 CircuitCity AI. All rights reserved.
+          © 2026 CircuCity AI. All rights reserved.
         </div>
       </div>
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 bg-lemon-gradient rounded-xl flex items-center justify-center">
               <Bot className="text-dark-navy w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-dark-navy">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-xl font-bold text-dark-navy">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
 
           <h1 className="text-3xl font-bold text-dark-navy mb-2">Welcome back</h1>

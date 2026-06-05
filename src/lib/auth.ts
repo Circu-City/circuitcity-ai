@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET || "circuitcity-ai-jwt-secret-key-change-in-production";
+const JWT_SECRET = process.env.JWT_SECRET || "CircuCity-ai-jwt-secret-key-change-in-production";
 
 export interface JWTPayload {
   userId: string;

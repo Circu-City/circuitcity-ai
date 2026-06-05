@@ -44,7 +44,7 @@ export default function OnboardingWizard() {
 
   useEffect(() => {
     if (apiKey && storeId) {
-      setEmbedCode(`<script src="https://chatbot.circuitcity.se/widget.js" data-store-id="${storeId}" data-api-key="${apiKey}"></script>`);
+      setEmbedCode(`<script src="https://chatbot.CircuCity.se/widget.js" data-store-id="${storeId}" data-api-key="${apiKey}"></script>`);
     }
   }, [apiKey, storeId]);
 
@@ -81,7 +81,7 @@ export default function OnboardingWizard() {
         body: JSON.stringify({ toneStyle, toneDesc }),
       });
       await fetch("/api/onboarding/complete", { method: "POST" });
-      toast.success("All set! Welcome to CircuitCity AI.");
+      toast.success("All set! Welcome to CircuCity AI.");
       router.push("/dashboard");
     } catch { toast.error("Failed to complete setup"); }
     finally { setLoading(false); }
@@ -96,7 +96,7 @@ export default function OnboardingWizard() {
             <div className="w-10 h-10 bg-lemon-gradient rounded-xl flex items-center justify-center shadow-lemon">
               <Bot className="text-dark-navy w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-dark-navy">CircuitCity<span className="text-lemon-green">AI</span></span>
+            <span className="text-xl font-bold text-dark-navy">CircuCity<span className="text-lemon-green">AI</span></span>
           </div>
           <h1 className="text-3xl font-bold text-dark-navy mb-2">Set Up Your AI Assistant</h1>
           <p className="text-gray-500">Follow these steps to get your AI chatbot live on your store.</p>

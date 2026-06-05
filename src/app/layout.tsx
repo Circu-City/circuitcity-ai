@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CircuitCity AI | Personalized AI Customer Support",
+  title: "CircuCity AI | Personalized AI Customer Support",
   description: "Empower your online store with a personalized AI customer support agent. Turn visitors into loyal customers with AI Chat.",
   keywords: ["AI chatbot", "customer support", "e-commerce", "AI assistant"],
 };
