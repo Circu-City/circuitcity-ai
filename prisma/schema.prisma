@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  customer
+  admin
+}
+
+enum Plan {
+  free
+  starter
+  pro
+  enterprise
+}
+
+enum SubscriptionStatus {
+  active
+  inactive
+  past_due
+  cancelled
+}
+
+enum StoreStatus {
+  active
+  inactive
+  pending
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  passwordHash  String?
+  role          Role           @default(customer)
+  image         String?
+  emailVerified DateTime?
+  storeUrl      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  stores        Store[]
+  conversations Conversation[]
+  apiKeys       ApiKey[]
+  usageLogs     UsageLog[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Store {
+  id            String      @id @default(cuid())
+  userId        String
+  name          String?
+  url           String?
+  industry      String?
+  apiKey        String      @unique @default(cuid())
+  embedCode     String?
+  status        StoreStatus @default(pending)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products      Product[]
+  conversations Conversation[]
+  subscriptions Subscription[]
+  apiKeys       ApiKey[]
+  usageLogs     UsageLog[]
+
+  @@index([userId])
+  @@index([apiKey])
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  storeId          String
+  plan             Plan               @default(free)
+  status           SubscriptionStatus @default(active)
+  currentPeriodEnd DateTime?
+  stripeId         String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([stripeId])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  name        String
+  price       Float
+  image       String?
+  description String?
+  category    String?
+  stock       Int      @default(0)
+  lastSynced  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([category])
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  storeId      String
+  userId       String?
+  sessionId    String
+  customerName String?
+  email        String?
+  messages     Json     @default("[]")
+  sentiment    String?
+  escalated    Boolean  @default(false)
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([storeId])
+  @@index([sessionId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  storeId     String
+  userId      String
+  key         String    @unique
+  name        String
+  permissions Json      @default("[]")
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([key])
+}
+
+model UsageLog {
+  id            String   @id @default(cuid())
+  storeId       String
+  userId        String
+  messagesCount Int      @default(0)
+  date          DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, date])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String?
+  read      Boolean  @default(false)
+  type      String   @default("info")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
+
+model AdminAction {
+  id          String   @id @default(cuid())
+  adminId     String
+  action      String
+  targetType  String?
+  targetId    String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([createdAt])
+}
+
+model EmbedConfig {
+  id        String   @id @default(cuid())
+  storeId   String   @unique
+  widgetColor String @default("#9EF01A")
+  position  String   @default("bottom-right")
+  title     String   @default("AI Assistant")
+  welcomeMsg String  @default("Hi! How can I help you today?")
+  toneStyle String   @default("friendly")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
