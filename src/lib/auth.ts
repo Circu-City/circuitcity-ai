@@ -74,8 +74,9 @@ export async function createSession(userId: string, email: string, role: "custom
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: 7 * 24 * 60 * 60,
     path: "/",
+    domain: process.env.NODE_ENV === "production" ? ".circucity.se" : undefined,
   });
   return token;
 }
