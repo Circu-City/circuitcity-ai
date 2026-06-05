@@ -1,11 +1,11 @@
-import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Key, Copy, Trash2, Plus } from "lucide-react";
 import crypto from "crypto";
 
 export default async function ApiKeysPage() {
-  const user = await auth();
+  const user = await requireAuth();
   if (!user) redirect("/login");
 
   const stores = await prisma.store.findMany({ where: { userId: user.id }, include: { apiKeys: true } });

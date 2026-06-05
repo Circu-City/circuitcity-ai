@@ -1,11 +1,11 @@
-import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { MessageSquare, Search } from "lucide-react";
 import Link from "next/link";
 
 export default async function ConversationsPage({ searchParams }: { searchParams: Promise<{ store?: string }> }) {
-  const user = await auth();
+  const user = await requireAuth();
   if (!user) redirect("/login");
   const { store: storeFilter } = await searchParams;
 

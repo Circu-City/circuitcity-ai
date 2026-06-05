@@ -1,10 +1,10 @@
-import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BarChart3, MessageSquare, ShoppingBag, TrendingUp } from "lucide-react";
 
 export default async function AnalyticsPage() {
-  const user = await auth();
+  const user = await requireAuth();
   if (!user) redirect("/login");
 
   const storeIds = (await prisma.store.findMany({ where: { userId: user.id }, select: { id: true } })).map(s => s.id);
