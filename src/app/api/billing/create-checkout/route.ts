@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "paypal"],
       line_items: [{ price_data: { currency: "sek", product_data: { name: `CircuCity AI - ${price.name} Plan` }, unit_amount: price.amount, recurring: { interval: "month" } }, quantity: 1 }],
       success_url: `https://chatbot.circucity.se/dashboard/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `https://chatbot.circucity.se/dashboard/billing?canceled=true`,
