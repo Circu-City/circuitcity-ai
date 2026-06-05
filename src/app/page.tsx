@@ -75,6 +75,11 @@ function Navbar() {
 }
 
 function NavDropdown({ label, items, scrolled }: { label: string; items: string[]; scrolled: boolean }) {
+  const router = useRouter();
+  const getHref = (item: string) => {
+    const slug = item.toLowerCase().replace(/\s+/g, "-");
+    return `/${slug === "api" ? "api-docs" : slug}`;
+  };
   return (
     <div className="group relative cursor-pointer">
       <span className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-600 group-hover:text-dark-navy" : "text-white/70 group-hover:text-white"}`}>
@@ -83,9 +88,9 @@ function NavDropdown({ label, items, scrolled }: { label: string; items: string[
       <div className="absolute top-full left-0 pt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all translate-y-2 group-hover:translate-y-0">
         <div className="bg-white shadow-xl rounded-2xl p-3 w-48 border border-gray-100">
           {items.map((item) => (
-            <a key={item} href="#" className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:text-dark-navy transition-colors">
+            <button key={item} onClick={() => router.push(getHref(item))} className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:text-dark-navy transition-colors">
               {item}
-            </a>
+            </button>
           ))}
         </div>
       </div>
@@ -114,11 +119,11 @@ function HeroSection() {
             <p className="text-lg text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               The ultimate AI support agent for custom online stores. Personalized, 24/7, and trained on your product data in under 15 minutes.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lemon flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+              <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lemon flex items-center gap-2 whitespace-nowrap">
                 Start 14-Day Free Trial <ArrowRight className="w-5 h-5" />
               </button>
-              <button onClick={() => router.push("/signup")} className="border-2 border-white/20 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white/10 backdrop-blur-sm transition-all">
+              <button onClick={() => router.push("/signup")} className="border-2 border-white/20 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-white/10 backdrop-blur-sm transition-all whitespace-nowrap">
                 Add Free AI Chatbot Now
               </button>
             </div>
@@ -297,11 +302,11 @@ function CTASection() {
           <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
             Join 2,000+ stores increasing their conversion rates by an average of 24% using CircuCity AI.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-10 py-5 rounded-xl text-xl hover:scale-105 transition-transform shadow-lemon flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-10 py-5 rounded-xl text-xl hover:scale-105 transition-transform shadow-lemon flex items-center gap-2 whitespace-nowrap">
               Start Free Trial Now <ArrowRight className="w-6 h-6" />
             </button>
-            <button onClick={() => router.push("/book-demo")} className="border-2 border-white/20 text-white px-10 py-5 rounded-xl text-xl font-medium hover:bg-white/10 backdrop-blur-sm transition-all">
+            <button onClick={() => router.push("/book-demo")} className="border-2 border-white/20 text-white px-10 py-5 rounded-xl text-xl font-medium hover:bg-white/10 backdrop-blur-sm transition-all whitespace-nowrap">
               Book a Demo
             </button>
           </div>
@@ -327,15 +332,19 @@ function Footer() {
         </div>
         {[
           { title: "Product", links: ["Features", "Pricing", "API", "Documentation"] },
-          { title: "Company", links: ["About", "Blog", "Careers", "Contact"] },
+          { title: "Company", links: ["About Us", "Blog", "Careers", "Contact"] },
           { title: "Legal", links: ["Privacy", "Terms", "GDPR", "Security"] },
         ].map((col) => (
           <div key={col.title}>
             <h4 className="text-white font-semibold mb-4">{col.title}</h4>
             <ul className="space-y-2 text-sm">
-              {col.links.map((link) => (
-                <li key={link}><a href="#" className="hover:text-white transition-colors">{link}</a></li>
-              ))}
+              {col.links.map((link) => {
+                const slug = link.toLowerCase().replace(/\s+/g, "-");
+                const href = `/${slug === "api" ? "api-docs" : slug}`;
+                return (
+                  <li key={link}><a href={href} className="hover:text-white transition-colors">{link}</a></li>
+                );
+              })}
             </ul>
           </div>
         ))}
