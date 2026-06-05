@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 export async function GET() {
   try {
-    await requireAdmin();
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const tickets = await prisma.conversation.findMany({
       where: { escalated: true },
       include: { store: { select: { name: true } }, user: { select: { name: true, email: true } } },
