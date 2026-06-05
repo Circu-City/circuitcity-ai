@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { Plan } from "@prisma/client";
+import Stripe from "stripe";
 
-const PLAN_PRICES: Record<string, number> = { free: 0, starter: 0, growth: 4900, enterprise: 19900 };
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "2025-01-27.acacia" as any });
+
+const PLAN_PRICES: Record<string, { amount: number; name: string }> = {
+  starter: { amount: 0, name: "Starter" },
+  growth: { amount: 4900, name: "Growth" },
+  enterprise: { amount: 19900, name: "Enterprise" },
+};
 
 export async function POST(req: Request) {
   try {
@@ -12,26 +18,36 @@ export async function POST(req: Request) {
 
     const { plan } = await req.json();
     if (!plan || !(plan in PLAN_PRICES)) return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
-
-    const store = await prisma.store.findFirst({ where: { userId: session.userId } });
-    if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });
-
-    const planKey = plan as Plan;
-    const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
-
-    // Sandbox mode - no real Stripe key needed
-    if (sub) {
-      await prisma.subscription.update({ where: { id: sub.id }, data: { plan: planKey } });
-    } else {
-      await prisma.subscription.create({ data: { storeId: store.id, plan: planKey } });
+    if (plan === "starter" || plan === "free") {
+      const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+      if (store) {
+        const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
+        if (sub) await prisma.subscription.update({ where: { id: sub.id }, data: { plan: plan as any } });
+        else await prisma.subscription.create({ data: { storeId: store.id, plan: plan as any } });
+      }
+      return NextResponse.json({ url: "/dashboard/billing?success=free" });
     }
 
-    return NextResponse.json({
-      sandbox: true,
-      message: `${plan.charAt(0).toUpperCase() + plan.slice(1)} plan activated!`,
+    let store = await prisma.store.findFirst({ where: { userId: session.userId } });
+    if (!store) {
+      store = await prisma.store.create({ data: { userId: session.userId, name: "My Store", status: "pending" } });
+    }
+
+    const price = PLAN_PRICES[plan];
+    const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
+
+    const stripeSession = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [{ price_data: { currency: "sek", product_data: { name: `CircuCity AI - ${price.name} Plan` }, unit_amount: price.amount, recurring: { interval: "month" } }, quantity: 1 }],
+      success_url: `https://chatbot.circucity.se/dashboard/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://chatbot.circucity.se/dashboard/billing?canceled=true`,
+      metadata: { storeId: store.id, plan, userId: session.userId },
     });
-  } catch (error) {
-    console.error("Checkout error:", error);
+
+    return NextResponse.json({ url: stripeSession.url });
+  } catch (error: any) {
+    console.error("Checkout error:", error.message);
     return NextResponse.json({ error: "Checkout failed. Please try again." }, { status: 500 });
   }
 }
