@@ -2,19 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --color-dark-navy: #0A1428;
-  --color-lemon-green: #A3E635;
-  --color-primary: #A3E635;
-  --color-primary-foreground: #0A1428;
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0A1428;
+    --card: #ffffff;
+    --card-foreground: #0A1428;
+    --popover: #ffffff;
+    --popover-foreground: #0A1428;
+    --primary: #A3E635;
+    --primary-foreground: #0A1428;
+    --secondary: #f3f4f6;
+    --secondary-foreground: #0A1428;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #f3f4f6;
+    --accent-foreground: #0A1428;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #A3E635;
+    --radius: 0.5rem;
+    --color-dark-navy: #0A1428;
+    --color-lemon-green: #A3E635;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
@@ -22,7 +42,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Custom utilities */
 .bg-lemon-gradient {
   background: linear-gradient(135deg, #A3E635, #9EF01A);
 }
@@ -33,4 +52,17 @@ body {
 
 .text-lemon-green {
   color: #A3E635;
+}
+
+.glow-lemon {
+  box-shadow: 0 0 60px rgba(163, 230, 53, 0.2), 0 0 120px rgba(163, 230, 53, 0.1);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
