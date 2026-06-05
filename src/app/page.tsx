@@ -119,7 +119,7 @@ function HeroSection() {
             <p className="text-lg text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               The ultimate AI support agent for custom online stores. Personalized, 24/7, and trained on your product data in under 15 minutes.
             </p>
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+            <div className="flex items-center justify-center lg:justify-start gap-4">
               <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-8 py-4 rounded-xl text-lg hover:scale-105 transition-transform shadow-lemon flex items-center gap-2 whitespace-nowrap">
                 Start 14-Day Free Trial <ArrowRight className="w-5 h-5" />
               </button>
@@ -302,7 +302,7 @@ function CTASection() {
           <p className="text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
             Join 2,000+ stores increasing their conversion rates by an average of 24% using CircuCity AI.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             <button onClick={() => router.push("/signup")} className="bg-lemon-gradient text-dark-navy font-bold px-10 py-5 rounded-xl text-xl hover:scale-105 transition-transform shadow-lemon flex items-center gap-2 whitespace-nowrap">
               Start Free Trial Now <ArrowRight className="w-6 h-6" />
             </button>
