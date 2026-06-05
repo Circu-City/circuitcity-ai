@@ -17,13 +17,14 @@ const pages: Record<string, { title: string; description: string }> = {
   api: { title: "API", description: "Powerful REST APIs to programmatically manage your AI agent and conversations." },
 };
 
-export default function Page({ params }: { params: { slug: string[] } }) {
-  const slug = params.slug[0] || "";
-  const page = pages[slug];
+export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = await params;
+  const key = slug[0] || "";
+  const page = pages[key];
 
   if (!page) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white pt-32">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-dark-navy mb-4">Page Not Found</h1>
           <Link href="/" className="text-lemon-green hover:underline">Return Home</Link>
