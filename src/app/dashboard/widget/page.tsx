@@ -123,7 +123,6 @@ export default function WidgetPage() {
             </>
             )}
           </div>
-          </div>
         </div>
       </div>
     </DashboardLayout>
