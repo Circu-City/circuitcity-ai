@@ -10,16 +10,23 @@ export async function POST(req: Request) {
     const { subject, message } = await req.json();
     if (!subject || !message) return NextResponse.json({ error: "Subject and message required" }, { status: 400 });
 
-    const supportTicket = await prisma.supportTicket.create({
+    const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+    const user = await prisma.user.findUnique({ where: { id: session.userId } });
+
+    await prisma.conversation.create({
       data: {
+        storeId: store?.id || "admin",
         userId: session.userId,
-        subject,
-        message,
-        status: "open",
+        sessionId: "ticket_" + Date.now(),
+        customerName: user?.name || "Support Ticket",
+        email: user?.email || "",
+        messages: [{ role: "user" as const, content: `[${subject}] ${message}` }],
+        escalated: true,
+        status: "active",
       },
     });
 
-    return NextResponse.json({ success: true, ticket: supportTicket });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Support ticket error:", error);
     return NextResponse.json({ error: "Failed to submit ticket" }, { status: 500 });

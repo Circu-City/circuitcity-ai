@@ -17,6 +17,7 @@ export default function SupportPage() {
     try {
       const res = await fetch("/api/support/ticket", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, message }),
       });
