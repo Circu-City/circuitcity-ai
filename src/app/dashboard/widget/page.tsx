@@ -21,7 +21,7 @@ export default function WidgetPage() {
       .catch(() => {});
   }, []);
 
-  const embedCode = `<script src="https://chatbot.circucity.se/widget.js" data-store-id="STORE_ID" data-api-key="${apiKey || "API_KEY"}"></script>`;
+  const embedCode = `<script src="https://chatbot.circucity.se/widget.js" data-store-id="${apiKey || "YOUR_STORE_API_KEY"}" async></script>`;
 
   const copyCode = () => {
     navigator.clipboard.writeText(embedCode);
@@ -99,8 +99,14 @@ export default function WidgetPage() {
 
           <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-6">
             <h2 className="text-lg font-semibold text-dark-navy">Embed Code</h2>
-            <p className="text-sm text-gray-500">Copy and paste this code just before the closing {"</body>"} tag on your website.</p>
-            
+            <p className="text-sm text-gray-500">Copy this code and paste it just before the closing {"</body>"} tag in your website.</p>
+            {!apiKey ? (
+              <div className="bg-gray-50 rounded-xl p-6 text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-lemon-green border-t-transparent rounded-full mx-auto mb-3" />
+                <p className="text-sm text-gray-500">Loading your store API key...</p>
+                <p className="text-xs text-gray-400 mt-1">Go to <a href="/dashboard/api-keys" className="text-lemon-green hover:underline">API Keys</a> if this takes too long.</p>
+              </div>
+            ) : (
             <div className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto relative">
               <code className="whitespace-pre-wrap break-all">{embedCode}</code>
               <button onClick={copyCode} className="absolute top-2 right-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
@@ -110,9 +116,10 @@ export default function WidgetPage() {
 
             <div className="bg-gray-50 rounded-xl p-6 text-center">
               <Code className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="font-semibold text-dark-navy mb-1">Preview</h3>
-              <p className="text-sm text-gray-500">Your widget will appear as a floating chat bubble on your store.</p>
+              <h3 className="font-semibold text-dark-navy mb-1">Your Unique Store ID</h3>
+              <p className="text-sm text-gray-500">The API key is pre-configured in this code. Just paste it into your website.</p>
             </div>
+            )}
           </div>
         </div>
       </div>
