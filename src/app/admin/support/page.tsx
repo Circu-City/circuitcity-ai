@@ -13,10 +13,10 @@ export default function AdminSupportPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/admin/support")
-      .then(async r => { if (r.status === 401) { toast.error("Admin access required"); router.push("/login"); return []; } return r.json(); })
+    fetch("/api/admin/support", { credentials: "include" })
+      .then(async r => { if (r.status === 401) { router.push("/login"); return []; } return r.json(); })
       .then(data => { setTickets(data || []); setLoading(false); })
-      .catch(() => { setLoading(false); toast.error("Failed to load tickets"); });
+      .catch(() => { setLoading(false); });
   }, [router]);
 
   const filtered = tickets.filter(t => !search || t.customer?.toLowerCase().includes(search.toLowerCase()) || t.email?.toLowerCase().includes(search.toLowerCase()) || t.storeName?.toLowerCase().includes(search.toLowerCase()));

@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/stats")
+    fetch("/api/admin/stats", { credentials: "include" })
       .then(async r => {
         if (r.status === 401) {
           // Try to re-auth - user might need to login

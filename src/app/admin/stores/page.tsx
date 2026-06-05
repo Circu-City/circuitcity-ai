@@ -13,10 +13,10 @@ export default function AdminStoresPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/admin/stores")
-      .then(async r => { if (r.status === 401) { toast.error("Admin access required"); router.push("/login"); return []; } return r.json(); })
+    fetch("/api/admin/stores", { credentials: "include" })
+      .then(async r => { if (r.status === 401) { router.push("/login"); return []; } return r.json(); })
       .then(data => { setStores(data || []); setLoading(false); })
-      .catch(() => { setLoading(false); toast.error("Failed to load stores"); });
+      .catch(() => { setLoading(false); });
   }, [router]);
 
   const filtered = stores.filter(s => !search || s.name?.toLowerCase().includes(search.toLowerCase()) || s.url?.toLowerCase().includes(search.toLowerCase()) || s.owner?.toLowerCase().includes(search.toLowerCase()));
