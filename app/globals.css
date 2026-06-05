@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --color-dark-navy: #0A1428;
+  --color-lemon-green: #A3E635;
+  --color-primary: #A3E635;
+  --color-primary-foreground: #0A1428;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom utilities */
+.bg-lemon-gradient {
+  background: linear-gradient(135deg, #A3E635, #9EF01A);
+}
+
+.shadow-lemon {
+  box-shadow: 0 4px 14px 0 rgba(163, 230, 53, 0.35);
+}
+
+.text-lemon-green {
+  color: #A3E635;
+}

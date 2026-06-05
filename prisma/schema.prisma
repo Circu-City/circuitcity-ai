@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  admin
+}
+
+enum SubscriptionPlan {
+  free
+  starter
+  pro
+  enterprise
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  past_due
+  incomplete
+  trialing
+}
+
+enum StoreStatus {
+  active
+  inactive
+  suspended
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String?
+  image        String?
+  role         UserRole @default(customer)
+  storeUrl     String?
+  emailVerified DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  stores        Store[]
+  conversations Conversation[]
+  adminActions  AdminActionLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Store {
+  id        String      @id @default(cuid())
+  userId    String
+  name      String
+  url       String?
+  industry  String?
+  apiKey    String?     @unique
+  embedCode String?
+  tone      String?     @default("professional")
+  status    StoreStatus @default(active)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products      Product[]
+  conversations Conversation[]
+  subscriptions Subscription[]
+  apiKeys       ApiKey[]
+  usageLogs     UsageLog[]
+  embedSettings  EmbedSettings?
+
+  @@index([userId])
+  @@index([apiKey])
+}
+
+model EmbedSettings {
+  id              String  @id @default(cuid())
+  storeId         String  @unique
+  primaryColor    String  @default("#9EF01A")
+  position        String  @default("bottom-right")
+  welcomeMessage  String  @default("Hi! How can I help you today?")
+  botName         String  @default("AI Assistant")
+  showBranding    Boolean @default(true)
+  autoOpen        Boolean @default(false)
+  autoOpenDelay   Int     @default(5)
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  storeId          String
+  plan             SubscriptionPlan   @default(free)
+  status           SubscriptionStatus @default(trialing)
+  currentPeriodEnd DateTime?
+  stripeId         String?            @unique
+  stripePriceId    String?
+  stripeStatus     String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([stripeId])
+  @@index([status])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  name        String
+  price       Float
+  image       String?
+  description String?
+  category    String?
+  stock       Int?
+  currency    String   @default("USD")
+  isActive    Boolean  @default(true)
+  lastSynced  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([category])
+  @@index([name])
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  storeId      String
+  userId       String?
+  sessionId    String   @unique
+  customerName String?
+  customerEmail String?
+  messages     Json     @default("[]")
+  sentiment    String?
+  escalated    Boolean  @default(false)
+  resolved     Boolean  @default(false)
+  pageUrl      String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  store  Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([storeId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([sentiment])
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  storeId     String
+  key         String   @unique
+  name        String
+  permissions String   @default("read")
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([key])
+}
+
+model UsageLog {
+  id            String   @id @default(cuid())
+  storeId       String
+  messagesCount Int      @default(0)
+  date          DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, date])
+  @@index([storeId])
+  @@index([date])
+}
+
+model AdminActionLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  action    String
+  target    String?
+  targetId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model StoreInvite {
+  id        String   @id @default(cuid())
+  storeId   String
+  email     String
+  role      String   @default("member")
+  token     String   @unique
+  accepted  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
+  @@index([token])
+}
