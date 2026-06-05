@@ -37,7 +37,7 @@ export default function SignupPage() {
         return;
       }
       toast.success("Account created! Let's set up your store.");
-      router.push("/onboarding");
+      router.push("/dashboard/billing");
     } catch {
       toast.error("Network error. Please try again.");
     } finally {
