@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Store, ArrowLeft, Search, ExternalLink, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminStoresPage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function AdminStoresPage() {
 
   useEffect(() => {
     fetch("/api/admin/stores", { credentials: "include" })
-      .then(r => { if (!r.ok) { router.push("/login"); return []; } return r.json(); })
+      .then(r => { if (!r.ok) { toast.error("Session expired. Redirecting to login..."); setTimeout(() => router.push("/login"), 1500); return []; } return r.json(); })
       .then(data => { setStores(data || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [router]);

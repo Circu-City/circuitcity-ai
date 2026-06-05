@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         <div><h1 className="text-2xl font-bold text-dark-navy">Admin Dashboard</h1><p className="text-gray-500">Manage your application</p></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[{ label: "Total Users", value: stats.users ?? 0, icon: Users, href: "/admin/users" },{ label: "Total Stores", value: stats.stores ?? 0, icon: Store, href: "/admin/stores" },{ label: "Subscriptions", value: stats.subscriptions ?? 0, icon: CreditCard, href: "/admin/stores" },{ label: "Conversations", value: stats.conversations ?? 0, icon: MessageSquare, href: "/admin/support" }].map(card => (
+          {[{ label: "Total Users", value: stats.users ?? 0, icon: Users, href: "/admin/users" },{ label: "Total Stores", value: stats.stores ?? 0, icon: Store, href: "/admin/stores" },{ label: "Subscriptions", value: stats.subscriptions ?? 0, icon: CreditCard, href: "/admin/subscriptions" },{ label: "Conversations", value: stats.conversations ?? 0, icon: MessageSquare, href: "/admin/support" }].map(card => (
             <Link key={card.label} href={card.href} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all block">
               <div className="flex items-center justify-between mb-3"><card.icon className="w-6 h-6 text-gray-400" /><span className="text-2xl font-bold text-dark-navy">{card.value}</span></div>
               <p className="text-sm text-gray-500">{card.label}</p>

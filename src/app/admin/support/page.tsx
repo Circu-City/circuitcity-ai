@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, TicketCheck, MessageSquare, Mail, Search } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminSupportPage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function AdminSupportPage() {
 
   useEffect(() => {
     fetch("/api/admin/support", { credentials: "include" })
-      .then(r => { if (!r.ok) { router.push("/login"); return []; } return r.json(); })
+      .then(r => { if (!r.ok) { toast.error("Session expired. Redirecting to login..."); setTimeout(() => router.push("/login"), 1500); return []; } return r.json(); })
       .then(data => { setTickets(data || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [router]);
