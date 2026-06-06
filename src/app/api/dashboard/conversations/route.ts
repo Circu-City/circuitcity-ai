@@ -7,8 +7,11 @@ export async function GET(req: NextRequest) {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+    if (!store) return NextResponse.json([]);
+
     const storeFilter = req.nextUrl.searchParams.get("store") || "";
-    const where: any = { store: { userId: session.userId } };
+    const where: any = { storeId: store.id };
     if (storeFilter) where.storeId = storeFilter;
 
     const conversations = await prisma.conversation.findMany({

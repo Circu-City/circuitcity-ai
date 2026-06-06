@@ -7,7 +7,9 @@ export async function GET() {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const storeIds = (await prisma.store.findMany({ where: { userId: session.userId }, select: { id: true } })).map(s => s.id);
+    const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+    if (!store) return NextResponse.json({ conversations: 0, messages: 0, monthly: [] });
+    const storeIds = [store.id];
     const [totalConvs, totalMsgs] = await Promise.all([
       prisma.conversation.count({ where: { storeId: { in: storeIds } } }),
       prisma.usageLog.aggregate({ where: { storeId: { in: storeIds }, date: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } }, _sum: { messagesCount: true } }),
