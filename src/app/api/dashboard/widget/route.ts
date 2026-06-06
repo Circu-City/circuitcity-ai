@@ -22,6 +22,27 @@ export async function GET() {
   }
 }
 
+export async function POST(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { storeId } = await req.json();
+
+    const store = await prisma.store.findFirst({ where: { id: storeId, userId: session.userId } });
+    if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });
+
+    const apiKey = await prisma.apiKey.create({
+      data: { storeId: store.id, userId: session.userId, key: "cc_live_" + Math.random().toString(36).substring(2, 18), name: "Generated Key" },
+    });
+
+    return NextResponse.json({ apiKey: apiKey.key, id: apiKey.id, name: apiKey.name });
+  } catch (error) {
+    console.error("Widget POST error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function PUT(req: Request) {
   try {
     const session = await getSession();

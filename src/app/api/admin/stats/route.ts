@@ -14,7 +14,7 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const [users, stores, subscriptions, conversations, recentUsers] = await Promise.all([
+    const [users, stores, subscriptions, conversations, recentUsers, activeSubs, revenue] = await Promise.all([
       prisma.user.count(),
       prisma.store.count(),
       prisma.subscription.count(),
@@ -24,13 +24,22 @@ export async function GET() {
         take: 10,
         select: { id: true, name: true, email: true, role: true, createdAt: true },
       }),
+      prisma.subscription.count({ where: { status: "active" } }),
+      (async () => {
+        const subs = await prisma.subscription.findMany({
+          where: { status: "active", plan: { not: "starter" } },
+          select: { plan: true },
+        });
+        return subs.reduce((total: number, s) => {
+          if (s.plan === "pro") return total + 4900;
+          if (s.plan === "enterprise") return total + 19900;
+          return total;
+        }, 0);
+      })(),
     ]);
 
     return NextResponse.json({
-      users,
-      stores,
-      subscriptions,
-      conversations,
+      users, stores, subscriptions, conversations, activeSubs, revenue,
       recentUsers,
       userRole: user.role,
       admin: { name: user.name, email: user.email },

@@ -18,5 +18,5 @@ export async function GET() {
       messages: Array.isArray(t.messages) ? (t.messages as any[]).length : 0,
       createdAt: t.createdAt, updatedAt: t.updatedAt,
     })));
-  } catch { return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); }
+  } catch (e: any) { return NextResponse.json({ error: "Failed to load tickets" }, { status: 500 }); }
 }

@@ -10,6 +10,19 @@ export async function POST() {
     const store = await prisma.store.findFirst({ where: { userId: session.userId } });
     if (!store) return NextResponse.json({ error: "No store" }, { status: 404 });
 
+    const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
+
+    if (sub?.stripeSubscriptionId) {
+      try {
+        const stripeKey = process.env.STRIPE_SECRET_KEY;
+        if (stripeKey) {
+          const Stripe = require("stripe");
+          const stripe = new Stripe(stripeKey);
+          await stripe.subscriptions.cancel(sub.stripeSubscriptionId);
+        }
+      } catch (e: any) { console.error("Stripe cancel error:", e.message); }
+    }
+
     await prisma.subscription.updateMany({
       where: { storeId: store.id },
       data: { status: "cancelled", plan: "starter" },

@@ -36,6 +36,7 @@ export default function DashboardStoresPage() {
     try {
       const res = await fetch("/api/onboarding/store", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, url, industry: "", platform: "custom" }),
       });
@@ -47,7 +48,7 @@ export default function DashboardStoresPage() {
 
   const handleGenerateKey = async (storeId: string) => {
     try {
-      const res = await fetch("/api/dashboard/widget", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeId }) });
+      const res = await fetch("/api/dashboard/widget", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeId }) });
       const data = await res.json();
       if (data.apiKey) {
         navigator.clipboard.writeText(data.apiKey);

@@ -8,13 +8,26 @@ export async function GET() {
 
   try {
     const stores = await prisma.store.findMany({
-      include: { user: { select: { name: true, email: true } }, subscriptions: true },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        subscriptions: true,
+        _count: { select: { conversations: true } },
+      },
       orderBy: { createdAt: "desc" },
     });
+
     return NextResponse.json(stores.map(s => ({
-      id: s.id, name: s.name, url: s.url, apiKey: s.apiKey, status: s.status,
+      id: s.id,
+      name: s.name,
+      url: s.url,
+      apiKey: s.apiKey,
+      status: s.status,
       owner: s.user?.name || s.user?.email || "—",
-      plan: s.subscriptions?.[0]?.plan || "free", conversations: 0,
+      ownerId: s.user?.id,
+      ownerEmail: s.user?.email,
+      plan: s.subscriptions?.[0]?.plan || "starter",
+      subscriptionStatus: s.subscriptions?.[0]?.status || "none",
+      conversations: s._count?.conversations || 0,
       createdAt: s.createdAt,
     })));
   } catch (e) { return NextResponse.json([], { status: 200 }); }
@@ -33,8 +46,14 @@ export async function DELETE(req: Request) {
 export async function PUT(req: Request) {
   const session = await getSession();
   if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id, status } = await req.json();
-  if (!id || !status) return NextResponse.json({ error: "id and status required" }, { status: 400 });
-  await prisma.store.update({ where: { id }, data: { status } });
+  const { id, status, name, url } = await req.json();
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+
+  const data: any = {};
+  if (status) data.status = status;
+  if (name !== undefined) data.name = name;
+  if (url !== undefined) data.url = url;
+
+  await prisma.store.update({ where: { id }, data });
   return NextResponse.json({ success: true });
 }

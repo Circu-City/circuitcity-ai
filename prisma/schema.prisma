@@ -49,6 +49,7 @@ model User {
   apiKeys       ApiKey[]
   usageLogs     UsageLog[]
   notifications Notification[]
+  adminActions  AdminAction[]
 
   @@index([email])
   @@index([role])
@@ -72,25 +73,28 @@ model Store {
   subscriptions Subscription[]
   apiKeys       ApiKey[]
   usageLogs     UsageLog[]
+  embedConfigs  EmbedConfig[]
 
   @@index([userId])
   @@index([apiKey])
 }
 
 model Subscription {
-  id               String             @id @default(cuid())
-  storeId          String
-  plan             Plan               @default(free)
-  status           SubscriptionStatus @default(active)
-  currentPeriodEnd DateTime?
-  stripeId         String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  id                    String             @id @default(cuid())
+  storeId               String
+  plan                  Plan               @default(free)
+  status                SubscriptionStatus @default(active)
+  currentPeriodEnd      DateTime?
+  stripeId              String?
+  stripeSubscriptionId  String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
 
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId])
   @@index([stripeId])
+  @@index([stripeSubscriptionId])
 }
 
 model Product {
@@ -190,6 +194,8 @@ model AdminAction {
   details     Json?
   createdAt   DateTime @default(now())
 
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
   @@index([adminId])
   @@index([createdAt])
 }
@@ -204,4 +210,6 @@ model EmbedConfig {
   toneStyle String   @default("friendly")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
