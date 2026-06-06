@@ -12,13 +12,19 @@ const DARK_NAVY = "#0A1428";
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
+    fetch("/api/auth/me", { credentials: "include" })
+      .then(async r => { if (r.ok) { const d = await r.json(); setUser(d); } })
+      .catch(() => {});
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const isLoggedIn = !!user;
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "py-3 bg-white/95 backdrop-blur-md shadow-sm" : "py-5 bg-dark-navy/95 backdrop-blur-md"}`}>
@@ -39,12 +45,25 @@ function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <button onClick={() => router.push("/login")} className={`px-5 py-2.5 rounded-lg font-semibold transition-colors ${scrolled ? "text-dark-navy hover:bg-gray-100" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
-            Log In
-          </button>
-          <button onClick={() => router.push("/signup")} className="px-5 py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy hover:opacity-90 shadow-lemon transition-all">
-            Start Free Trial
-          </button>
+          {isLoggedIn ? (
+            <>
+              <button onClick={() => router.push("/dashboard")} className={`px-5 py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy hover:opacity-90 shadow-lemon transition-all`}>
+                Dashboard
+              </button>
+              <button onClick={() => { fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => { router.push("/"); router.refresh(); }); }} className={`px-4 py-2.5 rounded-lg font-semibold transition-colors text-sm ${scrolled ? "text-dark-navy hover:bg-gray-100" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => router.push("/login")} className={`px-5 py-2.5 rounded-lg font-semibold transition-colors ${scrolled ? "text-dark-navy hover:bg-gray-100" : "text-white/80 hover:text-white hover:bg-white/10"}`}>
+                Log In
+              </button>
+              <button onClick={() => router.push("/signup")} className="px-5 py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy hover:opacity-90 shadow-lemon transition-all">
+                Start Free Trial
+              </button>
+            </>
+          )}
         </div>
 
         <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -61,12 +80,25 @@ function Navbar() {
               </a>
             ))}
             <hr className="my-2" />
+            {isLoggedIn ? (
+              <>
+                <button onClick={() => router.push("/dashboard")} className="w-full py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy shadow-lemon">
+                  Dashboard
+                </button>
+                <button onClick={() => { fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => { router.push("/"); router.refresh(); }); }} className="w-full py-2.5 rounded-lg font-semibold text-dark-navy border border-gray-200 hover:bg-gray-50">
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
             <button onClick={() => router.push("/login")} className="w-full py-2.5 rounded-lg font-semibold text-dark-navy border border-gray-200 hover:bg-gray-50">
               Log In
             </button>
             <button onClick={() => router.push("/signup")} className="w-full py-2.5 rounded-lg font-bold bg-lemon-gradient text-dark-navy shadow-lemon">
               Start Free Trial
             </button>
+              </>
+            )}
           </div>
         </div>
       )}

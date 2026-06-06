@@ -14,7 +14,7 @@ export default function TicketsPage() {
 
   useEffect(() => {
     fetch("/api/dashboard/conversations", { credentials: "include" })
-      .then(async r => { if (r.status === 401) { toast.error("Session expired"); setTimeout(() => router.push("/login"), 1500); return []; } if (!r.ok) throw new Error("Failed"); return r.json(); })
+      .then(async r => { if (!r.ok) { toast.error("Failed to load tickets"); return []; } return r.json(); })
       .then((data: any[]) => {
         const escalated = (data || []).filter((c: any) => c.escalated === true);
         setTickets(escalated);
