@@ -10,7 +10,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { message } = await req.json();
   if (!message?.trim()) return NextResponse.json({ error: "Message required" }, { status: 400 });
 
-  const conv = await prisma.conversation.findUnique({ where: { id, store: { userId: session.userId } } });
+  const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+  if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });
+
+  const conv = await prisma.conversation.findUnique({ where: { id, storeId: store.id } });
   if (!conv) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const messages = Array.isArray(conv.messages) ? [...conv.messages] : [];

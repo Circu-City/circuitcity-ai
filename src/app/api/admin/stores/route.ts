@@ -8,13 +8,13 @@ export async function GET() {
 
   try {
     const stores = await prisma.store.findMany({
-      include: { user: { select: { name: true, email: true } }, subscription: true },
+      include: { user: { select: { name: true, email: true } }, subscriptions: true },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(stores.map(s => ({
       id: s.id, name: s.name, url: s.url, apiKey: s.apiKey, status: s.status,
       owner: s.user?.name || s.user?.email || "—",
-      plan: s.subscription?.[0]?.plan || "free", conversations: 0,
+      plan: s.subscriptions?.[0]?.plan || "free", conversations: 0,
       createdAt: s.createdAt,
     })));
   } catch (e) { return NextResponse.json([], { status: 200 }); }

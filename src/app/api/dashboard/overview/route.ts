@@ -9,7 +9,7 @@ export async function GET() {
 
     const store = await prisma.store.findFirst({
       where: { userId: session.userId },
-      include: { subscription: true, apiKeys: true },
+      include: { subscriptions: true, apiKeys: true },
     });
 
     if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });

@@ -7,7 +7,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const conv = await prisma.conversation.findUnique({ where: { id, store: { userId: session.userId } } });
+  const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+  const conv = await prisma.conversation.findUnique({ where: { id, storeId: store?.id || "" } });
   if (!conv) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({
