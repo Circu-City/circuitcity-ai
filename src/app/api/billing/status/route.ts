@@ -8,17 +8,28 @@ export async function GET() {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const store = await prisma.store.findFirst({ where: { userId: session.userId } });
-    if (!store) return NextResponse.json({ plan: "free", status: "none" });
+    if (!store) return NextResponse.json({ plan: "starter", status: "none", messagesUsed: 0 });
 
     const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
-    const rawPlan = sub?.plan || "free";
-    const plan = rawPlan === "growth" ? "pro" : rawPlan === "pro" ? "pro" : rawPlan === "starter" ? "starter" : rawPlan === "enterprise" ? "enterprise" : "free";
+    const rawPlan = sub?.plan || "starter";
+    const plan = rawPlan === "growth" ? "pro" : rawPlan;
+
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const messagesUsed = await prisma.usageLog.aggregate({
+      where: { storeId: store.id, date: { gte: monthStart } },
+      _sum: { messagesCount: true },
+    });
+
     return NextResponse.json({
-      plan: plan,
+      plan,
       status: sub?.status || "active",
       currentPeriodEnd: sub?.currentPeriodEnd || null,
+      messagesUsed: messagesUsed._sum.messagesCount || 0,
     });
   } catch {
-    return NextResponse.json({ plan: "free", status: "none" });
+    return NextResponse.json({ plan: "starter", status: "none", messagesUsed: 0 });
   }
 }
