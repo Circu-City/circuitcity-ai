@@ -10,6 +10,7 @@ export default function ApiKeysPage() {
   const [stores, setStores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState("starter");
+  const [generatingFor, setGeneratingFor] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -23,23 +24,33 @@ export default function ApiKeysPage() {
   }, []);
 
   const generateKey = async (storeId: string) => {
+    setGeneratingFor(storeId);
     try {
       const res = await fetch("/api/dashboard/widget", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ storeId }),
       });
-      if (res.ok) { toast.success("Key generated!"); window.location.reload(); }
-      else toast.error("Failed");
-    } catch { toast.error("Failed"); }
+      const data = await res.json();
+      if (res.ok && data.apiKey) {
+        toast.success("Key generated!");
+        window.location.reload();
+      } else {
+        toast.error(data.error || "Key generation failed");
+      }
+    } catch {
+      toast.error("Key generation failed");
+    } finally {
+      setGeneratingFor(null);
+    }
   };
 
   const revokeKey = async (keyId: string) => {
     if (!confirm("Revoke this API key? This cannot be undone.")) return;
     try {
-      await fetch(`/api/admin/api-keys?id=${keyId}`, { method: "DELETE", credentials: "include" });
-      toast.success("Key revoked");
-      window.location.reload();
+      const res = await fetch(`/api/admin/api-keys?id=${keyId}`, { method: "DELETE", credentials: "include" });
+      if (res.ok) { toast.success("Key revoked"); window.location.reload(); }
+      else { const d = await res.json(); toast.error(d.error || "Failed"); }
     } catch { toast.error("Failed"); }
   };
 
@@ -75,11 +86,14 @@ export default function ApiKeysPage() {
                   <div className="p-6 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
                     <div><h3 className="font-bold text-dark-navy">{store.name}</h3><p className="text-sm text-gray-500">{store.url}</p></div>
                     {!isFree && (
-                      <button onClick={() => generateKey(store.id)} className="bg-lemon-gradient text-dark-navy font-bold px-4 py-1.5 rounded-lg text-sm hover:opacity-90 flex items-center gap-1"><Plus className="w-3 h-3" /> Generate Key</button>
+                      <button onClick={() => generateKey(store.id)} disabled={generatingFor === store.id}
+                        className="bg-lemon-gradient text-dark-navy font-bold px-4 py-1.5 rounded-lg text-sm hover:opacity-90 flex items-center gap-1 disabled:opacity-50">
+                        <Plus className="w-3 h-3" /> {generatingFor === store.id ? "Generating..." : "Generate Key"}
+                      </button>
                     )}
                   </div>
                   <div className="divide-y divide-gray-100">
-                    {keys.length === 0 ? <p className="p-6 text-sm text-gray-400">No keys generated yet.</p> : keys.map((k: any) => (
+                    {keys.length === 0 ? <p className="p-6 text-sm text-gray-400">No keys yet.</p> : keys.map((k: any) => (
                       <div key={k.id || k.key} className="p-4 flex items-center justify-between">
                         <div><code className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded">{k.key}</code></div>
                         <div className="flex gap-2">

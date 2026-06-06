@@ -13,6 +13,7 @@ export default function DashboardStoresPage() {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [adding, setAdding] = useState(false);
+  const [generatingFor, setGeneratingFor] = useState<string | null>(null);
 
   const fetchStores = () => {
     Promise.all([
@@ -38,9 +39,32 @@ export default function DashboardStoresPage() {
         body: JSON.stringify({ name, url, industry: "", platform: "custom" }),
       });
       if (res.ok) { toast.success("Store added!"); setName(""); setUrl(""); fetchStores(); }
-      else { const d = await res.json(); toast.error(d.error || "Failed to add store"); }
+      else { const d = await res.json(); toast.error(d.error || "Failed"); }
     } catch { toast.error("Failed to add store"); }
     finally { setAdding(false); }
+  };
+
+  const handleGenerateKey = async (storeId: string) => {
+    setGeneratingFor(storeId);
+    try {
+      const res = await fetch("/api/dashboard/widget", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeId }),
+      });
+      const data = await res.json();
+      if (data.apiKey) {
+        await navigator.clipboard.writeText(data.apiKey);
+        toast.success("Key generated and copied!");
+        fetchStores();
+      } else {
+        toast.error(data.error || "Failed to generate key");
+      }
+    } catch {
+      toast.error("Key generation failed");
+    } finally {
+      setGeneratingFor(null);
+    }
   };
 
   const isFree = plan === "starter";
@@ -66,7 +90,7 @@ export default function DashboardStoresPage() {
           <div className="mb-6 p-4 bg-lemon-green/5 border border-lemon-green/30 rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Zap className="w-5 h-5 text-lemon-green" />
-              <div><p className="text-sm font-semibold text-dark-navy">Starter Plan &middot; 1 store included</p><p className="text-xs text-gray-500">Upgrade to add up to 3 stores, generate additional API keys, and unlock advanced AI.</p></div>
+              <div><p className="text-sm font-semibold text-dark-navy">Starter Plan · 1 store included</p><p className="text-xs text-gray-500">Upgrade to add up to 3 stores, generate additional API keys, and unlock advanced AI.</p></div>
             </div>
             <Link href="/dashboard/billing" className="bg-lemon-gradient text-dark-navy font-bold px-4 py-2 rounded-lg text-sm hover:opacity-90 whitespace-nowrap">Upgrade</Link>
           </div>
@@ -90,10 +114,10 @@ export default function DashboardStoresPage() {
                       <button onClick={() => { navigator.clipboard.writeText(store.apiKey); toast.success("Copied!"); }} className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><Copy className="w-4 h-4" /></button>
                     </>
                   ) : !isFree ? (
-                    <button onClick={() => {
-                      fetch("/api/dashboard/widget", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeId: store.id }) })
-                        .then(r => r.json()).then(d => { if (d.apiKey) { navigator.clipboard.writeText(d.apiKey); toast.success("API key copied!"); fetchStores(); } });
-                    }} className="text-xs text-lemon-green font-semibold hover:underline">Generate API Key</button>
+                    <button onClick={() => handleGenerateKey(store.id)} disabled={generatingFor === store.id}
+                      className="text-xs text-lemon-green font-semibold hover:underline disabled:opacity-50">
+                      {generatingFor === store.id ? "Generating..." : "Generate API Key"}
+                    </button>
                   ) : null}
                   {store.url && <a href={store.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><ExternalLink className="w-4 h-4" /></a>}
                 </div>
