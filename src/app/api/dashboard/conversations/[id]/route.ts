@@ -1,19 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
+  try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await params;
-  const store = await prisma.store.findFirst({ where: { userId: session.userId } });
-  const conv = await prisma.conversation.findUnique({ where: { id, storeId: store?.id || "" } });
-  if (!conv) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const store = await prisma.store.findFirst({ where: { userId: session.userId } });
+    if (!store) return NextResponse.json({ error: "Store not found" }, { status: 404 });
 
-  return NextResponse.json({
-    id: conv.id, messages: conv.messages, status: conv.status,
-    escalated: conv.escalated, createdAt: conv.createdAt,
-    customerName: conv.customerName, email: conv.email,
-  });
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: params.id, storeId: store.id },
+    });
+
+    if (!conversation) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    return NextResponse.json({
+      ...conversation,
+      messages: Array.isArray(conversation.messages) ? conversation.messages : [],
+    });
+  } catch (e: any) {
+    console.error("Conversation detail error:", e.message);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

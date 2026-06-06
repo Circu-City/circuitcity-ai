@@ -12,8 +12,8 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/dashboard/overview", { credentials: "include" }).then(r => r.json()).catch(() => null),
-      fetch("/api/dashboard/analytics", { credentials: "include" }).then(r => r.json()).catch(() => null),
+      fetch("/api/dashboard/overview", { credentials: "include" }).then(async r => { if (!r.ok) return null; return r.json(); }).catch(() => null),
+      fetch("/api/dashboard/analytics", { credentials: "include" }).then(async r => { if (!r.ok) return null; return r.json(); }).catch(() => null),
     ]).then(([overview, analytics]) => {
       setStats({
         conversations: analytics?.conversations || 0,

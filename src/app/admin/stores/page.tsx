@@ -27,20 +27,26 @@ export default function AdminStoresPage() {
 
   const toggleStatus = async (store: any) => {
     const newStatus = store.status === "active" ? "inactive" : "active";
-    await fetch("/api/admin/stores", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: store.id, status: newStatus }),
-    });
-    toast.success(`Store ${newStatus}`);
-    loadStores();
+    try {
+      const r = await fetch("/api/admin/stores", {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: store.id, status: newStatus }),
+      });
+      const data = await r.json();
+      if (data.success) { toast.success(`Store ${newStatus}`); loadStores(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to update store"); }
   };
 
   const deleteStore = async (id: string, name: string) => {
     if (!confirm(`Delete store "${name}" and all related data?`)) return;
-    await fetch(`/api/admin/stores?id=${id}`, { method: "DELETE", credentials: "include" });
-    toast.success("Store deleted");
-    loadStores();
+    try {
+      const r = await fetch(`/api/admin/stores?id=${id}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json();
+      if (data.success) { toast.success("Store deleted"); loadStores(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to delete store"); }
   };
 
   const filtered = stores.filter((s: any) =>

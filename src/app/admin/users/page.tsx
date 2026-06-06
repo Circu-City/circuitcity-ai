@@ -12,28 +12,35 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
-    const r = await fetch("/api/admin/users");
-    if (r.status === 401) { router.push("/login"); return; }
-    const data = await r.json();
-    if (data.users) setUsers(data.users);
+    try {
+      const r = await fetch("/api/admin/users", { credentials: "include" });
+      if (r.status === 401) { router.push("/login"); return; }
+      if (!r.ok) { toast.error("Failed to load users"); setLoading(false); return; }
+      const data = await r.json();
+      if (data.users) setUsers(data.users);
+    } catch { toast.error("Failed to load users"); }
     setLoading(false);
   };
 
   useEffect(() => { fetchUsers(); }, []);
 
   const changeRole = async (userId: string, newRole: string) => {
-    const r = await fetch("/api/admin/users", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, role: newRole }) });
-    const data = await r.json();
-    if (data.success) { toast.success("User role updated!"); fetchUsers(); }
-    else toast.error(data.error || "Failed");
+    try {
+      const r = await fetch("/api/admin/users", { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, role: newRole }) });
+      const data = await r.json();
+      if (data.success) { toast.success("User role updated!"); fetchUsers(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to update user"); }
   };
 
   const deleteUser = async (userId: string) => {
     if (!confirm("Delete this user and all their data?")) return;
-    const r = await fetch(`/api/admin/users?id=${userId}`, { method: "DELETE" });
-    const data = await r.json();
-    if (data.success) { toast.success("User deleted"); fetchUsers(); }
-    else toast.error(data.error || "Failed");
+    try {
+      const r = await fetch(`/api/admin/users?id=${userId}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json();
+      if (data.success) { toast.success("User deleted"); fetchUsers(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to delete user"); }
   };
 
   return (

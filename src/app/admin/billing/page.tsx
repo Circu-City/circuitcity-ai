@@ -24,14 +24,16 @@ export default function AdminBillingPage() {
   }, []);
 
   const saveEdit = async (id: string) => {
-    await fetch("/api/admin/subscriptions", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, plan: editPlan, status: editStatus }),
-    });
-    toast.success("Updated");
-    setEditingId(null);
-    window.location.reload();
+    try {
+      const r = await fetch("/api/admin/subscriptions", {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, plan: editPlan, status: editStatus }),
+      });
+      const data = await r.json();
+      if (data.success) { toast.success("Updated"); setEditingId(null); window.location.reload(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to update subscription"); }
   };
 
   const startEdit = (sub: any) => {

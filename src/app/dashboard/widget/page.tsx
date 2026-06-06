@@ -13,7 +13,7 @@ export default function WidgetPage() {
 
   useEffect(() => {
     fetch("/api/dashboard/widget", { ...{ credentials: "include" }, credentials: "include" })
-      .then(r => r.json())
+      .then(async r => { if (!r.ok) throw new Error("Failed"); return r.json(); })
       .then(data => {
         if (data.config) setConfig(data.config);
         if (data.apiKey) setApiKey(data.apiKey);
@@ -35,6 +35,7 @@ export default function WidgetPage() {
     try {
       const res = await fetch("/api/dashboard/widget", {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
       });

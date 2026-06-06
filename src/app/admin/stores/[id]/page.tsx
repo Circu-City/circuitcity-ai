@@ -24,29 +24,35 @@ export default function AdminStoreDetailPage({ params }: { params: { id: string 
 
   const saveStore = async () => {
     try {
-      await fetch("/api/admin/stores", {
+      const r = await fetch("/api/admin/stores", {
         method: "PUT", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: store.id, name, url, status }),
       });
-      toast.success("Store updated");
-      setEditing(false);
-      window.location.reload();
+      const data = await r.json();
+      if (data.success) { toast.success("Store updated"); setEditing(false); window.location.reload(); }
+      else toast.error(data.error || "Failed");
     } catch { toast.error("Failed"); }
   };
 
   const deleteStore = async () => {
     if (!confirm("Permanently delete this store and all related data?")) return;
-    await fetch(`/api/admin/stores?id=${store.id}`, { method: "DELETE", credentials: "include" });
-    toast.success("Store deleted");
-    router.push("/admin/stores");
+    try {
+      const r = await fetch(`/api/admin/stores?id=${store.id}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json();
+      if (data.success) { toast.success("Store deleted"); router.push("/admin/stores"); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to delete store"); }
   };
 
   const revokeKey = async (keyId: string) => {
     if (!confirm("Revoke this API key?")) return;
-    await fetch(`/api/admin/api-keys?id=${keyId}`, { method: "DELETE", credentials: "include" });
-    toast.success("Key revoked");
-    window.location.reload();
+    try {
+      const r = await fetch(`/api/admin/api-keys?id=${keyId}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json();
+      if (data.success) { toast.success("Key revoked"); window.location.reload(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to revoke key"); }
   };
 
   if (loading) return <div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full mx-auto mt-20" />;

@@ -13,9 +13,9 @@ export default function SettingsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/auth/me", { credentials: "include" }).then(r => r.json()).catch(() => ({})),
-      fetch("/api/dashboard/overview", { credentials: "include" }).then(r => r.json()).catch(() => ({})),
-      fetch("/api/billing/status", { credentials: "include" }).then(r => r.json()).catch(() => ({})),
+      fetch("/api/auth/me", { credentials: "include" }).then(async r => { if (!r.ok) return {}; return r.json(); }).catch(() => ({})),
+      fetch("/api/dashboard/overview", { credentials: "include" }).then(async r => { if (!r.ok) return {}; return r.json(); }).catch(() => ({})),
+      fetch("/api/billing/status", { credentials: "include" }).then(async r => { if (!r.ok) return {}; return r.json(); }).catch(() => ({})),
     ]).then(([me, overview, billing]) => {
       const store = overview?.stores?.[0] || {};
       setForm({

@@ -3,10 +3,10 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const user = await prisma.user.findUnique({
       where: { id: params.id },
       include: {
@@ -22,20 +22,11 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     return NextResponse.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      image: user.image,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      id: user.id, name: user.name, email: user.email,
+      role: user.role, image: user.image, emailVerified: user.emailVerified,
+      createdAt: user.createdAt, updatedAt: user.updatedAt,
       stores: user.stores.map(s => ({
-        id: s.id,
-        name: s.name,
-        url: s.url,
-        status: s.status,
-        apiKey: s.apiKey,
+        id: s.id, name: s.name, url: s.url, status: s.status, apiKey: s.apiKey,
         plan: s.subscriptions?.[0]?.plan || "starter",
         subscriptionStatus: s.subscriptions?.[0]?.status || "none",
         recentConversations: s.conversations.map(c => ({
@@ -46,7 +37,8 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       notifications: user.notifications,
       counts: { stores: user._count.stores, notifications: user._count.notifications },
     });
-  } catch (e) {
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  } catch (e: any) {
+    console.error("Admin user detail error:", e.message);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

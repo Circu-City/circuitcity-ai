@@ -3,10 +3,10 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const stores = await prisma.store.findMany({
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -17,43 +17,54 @@ export async function GET() {
     });
 
     return NextResponse.json(stores.map(s => ({
-      id: s.id,
-      name: s.name,
-      url: s.url,
-      apiKey: s.apiKey,
-      status: s.status,
+      id: s.id, name: s.name, url: s.url, apiKey: s.apiKey, status: s.status,
       owner: s.user?.name || s.user?.email || "—",
-      ownerId: s.user?.id,
-      ownerEmail: s.user?.email,
+      ownerId: s.user?.id, ownerEmail: s.user?.email,
       plan: s.subscriptions?.[0]?.plan || "starter",
       subscriptionStatus: s.subscriptions?.[0]?.status || "none",
       conversations: s._count?.conversations || 0,
       createdAt: s.createdAt,
     })));
-  } catch (e) { return NextResponse.json([], { status: 200 }); }
+  } catch (e: any) {
+    console.error("Admin stores error:", e.message);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: Request) {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-  await prisma.store.delete({ where: { id } });
-  return NextResponse.json({ success: true });
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    await prisma.store.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    console.error("Admin stores delete error:", e.message);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function PUT(req: Request) {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id, status, name, url } = await req.json();
-  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const data: any = {};
-  if (status) data.status = status;
-  if (name !== undefined) data.name = name;
-  if (url !== undefined) data.url = url;
+    const { id, status, name, url } = await req.json();
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
-  await prisma.store.update({ where: { id }, data });
-  return NextResponse.json({ success: true });
+    const data: any = {};
+    if (status) data.status = status;
+    if (name !== undefined) data.name = name;
+    if (url !== undefined) data.url = url;
+
+    await prisma.store.update({ where: { id }, data });
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    console.error("Admin stores update error:", e.message);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

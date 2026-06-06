@@ -19,20 +19,26 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
   }, [params.id, router]);
 
   const changeRole = async (userId: string, role: string) => {
-    await fetch("/api/admin/users", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, role }),
-    });
-    toast.success(`Role changed to ${role}`);
-    window.location.reload();
+    try {
+      const r = await fetch("/api/admin/users", {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role }),
+      });
+      const data = await r.json();
+      if (data.success) { toast.success(`Role changed to ${role}`); window.location.reload(); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to change role"); }
   };
 
   const deleteUser = async () => {
     if (!confirm("Permanently delete this user and all related data?")) return;
-    await fetch(`/api/admin/users?id=${userData.id}`, { method: "DELETE", credentials: "include" });
-    toast.success("User deleted");
-    router.push("/admin/users");
+    try {
+      const r = await fetch(`/api/admin/users?id=${userData.id}`, { method: "DELETE", credentials: "include" });
+      const data = await r.json();
+      if (data.success) { toast.success("User deleted"); router.push("/admin/users"); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Failed to delete user"); }
   };
 
   if (loading) return <div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full mx-auto mt-20" />;

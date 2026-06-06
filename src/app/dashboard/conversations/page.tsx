@@ -13,7 +13,7 @@ export default function ConversationsPage() {
 
   useEffect(() => {
     fetch("/api/dashboard/conversations", { credentials: "include" })
-      .then(r => r.json())
+      .then(async r => { if (!r.ok) throw new Error("Failed"); return r.json(); })
       .then((data: any[]) => {
         const convs = (data || []).filter((c: any) => !c.escalated);
         setConversations(convs);

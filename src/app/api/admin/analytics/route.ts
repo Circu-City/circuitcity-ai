@@ -3,16 +3,19 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await getSession();
-  if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
     const [users, stores, conversations, subscriptions, usageLogs, subData] = await Promise.all([
       prisma.user.count(),
       prisma.store.count(),
       prisma.conversation.count(),
       prisma.subscription.count(),
-      prisma.usageLog.findMany({ orderBy: { date: "asc" } }),
+      prisma.usageLog.findMany({ where: { date: { gte: sixMonthsAgo } }, orderBy: { date: "asc" } }),
       prisma.subscription.findMany({ where: { status: "active" }, select: { plan: true } }),
     ]);
 
@@ -47,7 +50,8 @@ export async function GET() {
       activeSubscriptions, revenue, maxMonthly, monthlyMessages,
       planDistribution, revenueBreakdown,
     });
-  } catch (e) {
+  } catch (e: any) {
+    console.error("Admin analytics error:", e.message);
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

@@ -47,9 +47,11 @@ export default function TicketDetailPage() {
   const messages = Array.isArray(ticket.messages) ? ticket.messages : [];
 
   const handleClose = async () => {
-    await fetch(`/api/admin/support/${id}`, { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "closed" }) });
-    toast.success("Ticket closed");
-    router.push("/admin/support");
+    try {
+      const r = await fetch(`/api/admin/support/${id}`, { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "closed" }) });
+      if (r.ok) { toast.success("Ticket closed"); router.push("/admin/support"); }
+      else toast.error("Failed to close ticket");
+    } catch { toast.error("Failed to close ticket"); }
   };
 
   return (
