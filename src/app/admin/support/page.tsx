@@ -19,7 +19,7 @@ export default function AdminSupportPage() {
       .catch(() => setLoading(false));
   }, [router]);
 
-  const filtered = tickets.filter(t => !search || t.customer?.toLowerCase().includes(search.toLowerCase()) || t.email?.toLowerCase().includes(search.toLowerCase()) || t.storeName?.toLowerCase().includes(search.toLowerCase()));
+  const filtered = tickets.filter(t => !search || (t.customer || t.customerName || "").toLowerCase().includes(search.toLowerCase()) || t.email?.toLowerCase().includes(search.toLowerCase()) || t.storeName?.toLowerCase().includes(search.toLowerCase()));
 
   if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full" /></div>;
 
@@ -38,7 +38,7 @@ export default function AdminSupportPage() {
         <div className="space-y-3">
           {filtered.map(ticket => (
             <Link key={ticket.id} href={`/admin/support/${ticket.id}`} className="block bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-lemon-green hover:shadow-md transition-all">
-              <div className="flex items-center justify-between mb-2"><div><span className="font-bold text-dark-navy">{ticket.customer}</span><span className="text-xs text-gray-400 ml-2">{ticket.email}</span></div><div className="flex items-center gap-3"><span className="text-xs text-gray-400">{ticket.storeName}</span><span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">{ticket.status}</span></div></div>
+              <div className="flex items-center justify-between mb-2"><div><span className="font-bold text-dark-navy">{ticket.customer || ticket.customerName || "—"}</span><span className="text-xs text-gray-400 ml-2">{ticket.email}</span></div><div className="flex items-center gap-3"><span className="text-xs text-gray-400">{ticket.storeName}</span><span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">{ticket.status}</span></div></div>
               <div className="flex items-center gap-4 text-xs text-gray-400"><span><MessageSquare className="w-3 h-3 inline mr-1" />{ticket.messages} messages</span><span><Mail className="w-3 h-3 inline mr-1" />{ticket.email}</span><span>{new Date(ticket.createdAt).toLocaleDateString()}</span></div>
             </Link>
           ))}

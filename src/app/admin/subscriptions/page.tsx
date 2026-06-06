@@ -46,7 +46,7 @@ export default function AdminSubscriptionsPage() {
                 <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3"><div className="font-medium text-dark-navy">{s.storeName}</div><div className="text-xs text-gray-400">{s.storeUrl}</div></td>
                   <td className="px-4 py-3 text-gray-600 text-xs">{s.userEmail}</td>
-                  <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.plan === 'enterprise' ? 'bg-purple-100 text-purple-600' : s.plan === 'growth' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{s.plan}</span></td>
+                  <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.plan === 'enterprise' ? 'bg-purple-100 text-purple-600' : s.plan === 'pro' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>{s.plan}</span></td>
                   <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{s.status}</span></td>
                   <td className="px-4 py-3 text-xs text-gray-500 font-mono">{s.stripeId}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">{s.currentPeriodEnd ? new Date(s.currentPeriodEnd).toLocaleDateString() : "—"}</td>
