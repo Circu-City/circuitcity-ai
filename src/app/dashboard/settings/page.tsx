@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard-layout";
 import { toast } from "sonner";
-import { Shield, Eye, EyeOff, Smartphone, KeyRound, Save, User, Mail, Phone, MapPin, Building2 } from "lucide-react";
+import { Shield, Eye, EyeOff, Smartphone, KeyRound, Save, User, Mail, Store, Globe } from "lucide-react";
 
 export default function SettingsPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", company: "", notifications: { email: true, weekly: true, updates: false } });
+  const [form, setForm] = useState({ name: "", email: "", storeName: "", storeUrl: "", notifications: { email: true, weekly: true, updates: false } });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -26,21 +26,15 @@ export default function SettingsPage() {
       .then(r => r.json())
       .then(data => {
         if (data.user) {
-          setForm(prev => ({
-            ...prev,
-            name: data.user.name || "",
-            email: data.user.email || "",
-            phone: data.user.phone || "",
-            address: data.user.address || "",
-            company: data.user.company || "",
-            notifications: data.notifications || { email: true, weekly: true, updates: false },
-          }));
+          setForm(prev => ({ ...prev, name: data.user.name || "", email: data.user.email || "" }));
         }
       })
       .catch(() => {});
-    fetch("/api/auth/2fa", { credentials: "include" })
+    fetch("/api/dashboard/widget", { credentials: "include" })
       .then(r => r.json())
-      .then(data => { if (typeof data.enabled === "boolean") setTwoFAEnabled(data.enabled); })
+      .then(data => {
+        setForm(prev => ({ ...prev, notifications: data.notifications || prev.notifications }));
+      })
       .catch(() => {});
   }, []);
 
@@ -104,9 +98,8 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <I label="Full Name" icon={User} value={form.name} onChange={(e: any) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
             <I label="Email" icon={Mail} type="email" value={form.email} onChange={(e: any) => setForm({ ...form, email: e.target.value })} placeholder="your@email.com" />
-            <I label="Phone" icon={Phone} value={form.phone} onChange={(e: any) => setForm({ ...form, phone: e.target.value })} placeholder="+46 70 123 45 67" />
-            <I label="Company" icon={Building2} value={form.company} onChange={(e: any) => setForm({ ...form, company: e.target.value })} placeholder="Company name" />
-            <I label="Address" icon={MapPin} value={form.address} onChange={(e: any) => setForm({ ...form, address: e.target.value })} placeholder="Street address" />
+            <I label="Store Name" icon={Store} value={form.storeName} onChange={(e: any) => setForm({ ...form, storeName: e.target.value })} placeholder="Your store name" />
+            <I label="Store URL" icon={Globe} value={form.storeUrl} onChange={(e: any) => setForm({ ...form, storeUrl: e.target.value })} placeholder="https://mystore.com" />
           </div>
         </div>
 
