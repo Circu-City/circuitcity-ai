@@ -11,7 +11,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
-      select: { id: true, name: true, email: true, role: true, image: true, notificationsEmail: true, notificationsWeekly: true, notificationsUpdates: true },
+      select: { id: true, name: true, email: true, role: true, image: true },
     });
 
     if (!user) {
@@ -19,18 +19,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        image: user.image,
-      },
-      notifications: {
-        email: user.notificationsEmail,
-        weekly: user.notificationsWeekly,
-        updates: user.notificationsUpdates,
-      },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, image: user.image },
     });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
