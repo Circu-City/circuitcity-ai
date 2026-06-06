@@ -1,65 +1,100 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
+import { MessageSquare, Bot, User, Clock, Search } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout";
+import { toast } from "sonner";
 
 export default function ConversationsPage() {
-  const router = useRouter();
   const [conversations, setConversations] = useState<any[]>([]);
-  const [stores, setStores] = useState<any[]>([]);
-  const [storeFilter, setStoreFilter] = useState("");
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" })
-      .then(async r => { if (r.status === 401) { router.push("/login"); return null; } return r.json(); })
-      .then(d => { if (d) { setStores(d.stores || []); return fetch("/api/dashboard/conversations?store=" + (storeFilter || "")); } return null; })
-      .then(async r => { if (!r || r.status === 401) { router.push("/login"); return []; } return r.json(); })
-      .then(data => { setConversations(data || []); setLoading(false); })
-      .catch(() => { setLoading(false); toast.error("Failed to load conversations"); });
-  }, [router, storeFilter]);
+    fetch("/api/dashboard/conversations", { credentials: "include" })
+      .then(r => r.json())
+      .then((data: any[]) => {
+        const convs = (data || []).filter((c: any) => !c.escalated);
+        setConversations(convs);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  if (loading) return <DashboardLayout><div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full mx-auto mt-20" /></DashboardLayout>;
+  const filtered = conversations.filter((c: any) => {
+    if (!search) return true;
+    const msgs = Array.isArray(c.messages) ? c.messages : [];
+    const text = msgs.map((m: any) => m.content || "").join(" ").toLowerCase();
+    return text.includes(search.toLowerCase()) || (c.customerName || "").toLowerCase().includes(search.toLowerCase());
+  });
+
+  if (loading) return <DashboardLayout><div className="flex justify-center py-20"><div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full" /></div></DashboardLayout>;
 
   return (
     <DashboardLayout>
       <div>
         <div className="flex items-center justify-between mb-8">
-          <div><h1 className="text-2xl font-bold text-dark-navy">Conversations</h1><p className="text-gray-500">View and manage chatbot conversations</p></div>
-          <select value={storeFilter} onChange={e => setStoreFilter(e.target.value)} className="px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white">
-            <option value="">All Stores</option>
-            {stores.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          <div>
+            <h1 className="text-2xl font-bold text-dark-navy">Conversations</h1>
+            <p className="text-gray-500">Chatbot interactions from your website visitors</p>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations..." className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm w-64" />
+          </div>
         </div>
+
         {conversations.length === 0 ? (
           <div className="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200">
-            <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Bot className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-500 mb-2">No conversations yet</h3>
-            <p className="text-gray-400">Conversations will appear here when visitors interact with your chatbot.</p>
+            <p className="text-gray-400 max-w-md mx-auto">When visitors interact with your chatbot, conversations will appear here. Add the embed code to your website to get started.</p>
+            <Link href="/dashboard/widget" className="inline-block mt-4 text-lemon-green font-semibold hover:underline">Set up Chat Widget →</Link>
           </div>
         ) : (
           <div className="space-y-3">
-            {conversations.map((conv: any) => {
-              const msgs = Array.isArray(conv.messages) ? conv.messages : [];
-              const lastMsg = msgs[msgs.length - 1];
-              return (
-                <Link key={conv.id} href={`/dashboard/conversations/${conv.id}`} className="block bg-white rounded-2xl border border-gray-200 p-5 hover:border-lemon-green hover:shadow-sm transition-all">
-                  <div className="flex items-center justify-between mb-2">
-                    <div><span className="font-bold text-dark-navy">{conv.customerName || "Visitor"} {conv.email ? `(${conv.email})` : ""}</span><span className="text-xs text-gray-400 ml-2">{conv.store?.name}</span></div>
-                    <span className="text-xs text-gray-400">{new Date(conv.createdAt).toLocaleDateString()}</span>
+            {filtered.length === 0 && search ? (
+              <p className="text-center py-8 text-gray-400">No conversations match your search.</p>
+            ) : (
+              filtered.map((conv: any) => {
+                const msgs = Array.isArray(conv.messages) ? conv.messages : [];
+                const firstMsg = msgs[0];
+                const lastMsg = msgs[msgs.length - 1];
+                return (
+                  <div key={conv.id} className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-lemon-green hover:shadow-sm transition-all">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-lemon-green/10 rounded-lg">
+                          {conv.customerName ? <User className="w-5 h-5 text-lemon-green" /> : <Bot className="w-5 h-5 text-lemon-green" />}
+                        </div>
+                        <div>
+                          <span className="font-bold text-dark-navy">{conv.customerName || "Anonymous Visitor"}</span>
+                          <span className="text-xs text-gray-400 ml-2">{conv.sessionId?.substring(0, 8)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <Clock className="w-3 h-3" />
+                        <span>{new Date(conv.createdAt).toLocaleDateString()}</span>
+                        <span className="bg-gray-100 px-2 py-0.5 rounded-full text-[10px]">{msgs.length} messages</span>
+                      </div>
+                    </div>
+                    {firstMsg && (
+                      <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600">
+                        <span className="text-xs text-gray-400">{firstMsg.role === "user" ? "Visitor" : "Bot"}:</span>{" "}
+                        {firstMsg.content?.substring(0, 150)}{firstMsg.content?.length > 150 ? "..." : ""}
+                      </div>
+                    )}
+                    {lastMsg && lastMsg !== firstMsg && (
+                      <div className="mt-2 pl-4 border-l-2 border-lemon-green/30 text-sm text-gray-500">
+                        <span className="text-xs text-gray-400">{lastMsg.role === "user" ? "Visitor" : "Bot"}:</span>{" "}
+                        {lastMsg.content?.substring(0, 100)}{lastMsg.content?.length > 100 ? "..." : ""}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 line-clamp-2">{lastMsg?.content || "No messages"}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${conv.escalated ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>{conv.escalated ? "Escalated" : "Active"}</span>
-                    <span className="text-xs text-gray-400">{msgs.length} messages</span>
-                  </div>
-                </Link>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         )}
       </div>
