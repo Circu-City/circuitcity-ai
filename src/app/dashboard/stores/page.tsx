@@ -1,30 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, ExternalLink, Copy, Store } from "lucide-react";
+import { Plus, ExternalLink, Copy, Store, Zap } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/dashboard-layout";
-import { apiFetch } from "@/lib/api-client";
 
 export default function DashboardStoresPage() {
-  const router = useRouter();
   const [stores, setStores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState("starter");
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [adding, setAdding] = useState(false);
 
   const fetchStores = () => {
-    fetch("/api/dashboard/overview", { ...{ credentials: "include" }, credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        const s = d.stores || [];
-        setStores(s);
-        setLoading(false);
-      })
-      .catch(() => { setLoading(false); toast.error("Failed to load stores"); });
+    Promise.all([
+      fetch("/api/dashboard/overview", { credentials: "include" }).then(r => r.json()),
+      fetch("/api/billing/status", { credentials: "include" }).then(r => r.json()),
+    ]).then(([overview, billing]) => {
+      setStores(overview.stores || []);
+      setPlan(billing.plan || "starter");
+      setLoading(false);
+    }).catch(() => { setLoading(false); });
   };
 
   useEffect(() => { fetchStores(); }, []);
@@ -35,28 +33,18 @@ export default function DashboardStoresPage() {
     setAdding(true);
     try {
       const res = await fetch("/api/onboarding/store", {
-        method: "POST",
-        credentials: "include",
+        method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, url, industry: "", platform: "custom" }),
       });
       if (res.ok) { toast.success("Store added!"); setName(""); setUrl(""); fetchStores(); }
-      else toast.error("Failed to add store");
+      else { const d = await res.json(); toast.error(d.error || "Failed to add store"); }
     } catch { toast.error("Failed to add store"); }
     finally { setAdding(false); }
   };
 
-  const handleGenerateKey = async (storeId: string) => {
-    try {
-      const res = await fetch("/api/dashboard/widget", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeId }) });
-      const data = await res.json();
-      if (data.apiKey) {
-        navigator.clipboard.writeText(data.apiKey);
-        toast.success("API key copied!");
-        fetchStores();
-      }
-    } catch { toast.error("Failed to generate key"); }
-  };
+  const isFree = plan === "starter";
+  const atLimit = isFree && stores.length >= 1;
 
   if (loading) return <DashboardLayout><div className="animate-spin w-10 h-10 border-2 border-lemon-green border-t-transparent rounded-full mx-auto mt-20" /></DashboardLayout>;
 
@@ -65,12 +53,25 @@ export default function DashboardStoresPage() {
       <div>
         <div className="flex items-center justify-between mb-8">
           <div><h1 className="text-2xl font-bold text-dark-navy">Stores</h1><p className="text-gray-500">Manage your connected stores</p></div>
-          <form onSubmit={addStore} className="flex gap-3">
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Store Name" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
-            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://mystore.com" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
-            <button type="submit" disabled={adding} className="bg-lemon-gradient text-dark-navy font-bold px-5 py-2 rounded-xl text-sm hover:opacity-90 flex items-center gap-2">{adding ? "Adding..." : <><Plus className="w-4 h-4" /> Add Store</>}</button>
-          </form>
+          {!atLimit && (
+            <form onSubmit={addStore} className="flex gap-3">
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Store Name" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
+              <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://mystore.com" required className="px-4 py-2 border border-gray-200 rounded-xl text-sm" />
+              <button type="submit" disabled={adding} className="bg-lemon-gradient text-dark-navy font-bold px-5 py-2 rounded-xl text-sm hover:opacity-90 flex items-center gap-2">{adding ? "Adding..." : <><Plus className="w-4 h-4" /> Add Store</>}</button>
+            </form>
+          )}
         </div>
+
+        {isFree && stores.length > 0 && (
+          <div className="mb-6 p-4 bg-lemon-green/5 border border-lemon-green/30 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Zap className="w-5 h-5 text-lemon-green" />
+              <div><p className="text-sm font-semibold text-dark-navy">Starter Plan &middot; 1 store included</p><p className="text-xs text-gray-500">Upgrade to add up to 3 stores, generate additional API keys, and unlock advanced AI.</p></div>
+            </div>
+            <Link href="/dashboard/billing" className="bg-lemon-gradient text-dark-navy font-bold px-4 py-2 rounded-lg text-sm hover:opacity-90 whitespace-nowrap">Upgrade</Link>
+          </div>
+        )}
+
         {stores.length === 0 ? (
           <div className="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200"><Store className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-xl font-bold text-gray-500 mb-2">No stores yet</h3></div>
         ) : (
@@ -88,9 +89,12 @@ export default function DashboardStoresPage() {
                       <span className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1 rounded-lg">{store.apiKey.substring(0, 20)}...</span>
                       <button onClick={() => { navigator.clipboard.writeText(store.apiKey); toast.success("Copied!"); }} className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><Copy className="w-4 h-4" /></button>
                     </>
-                  ) : (
-                    <button onClick={() => handleGenerateKey(store.id)} className="text-xs text-lemon-green font-semibold hover:underline">Generate API Key</button>
-                  )}
+                  ) : !isFree ? (
+                    <button onClick={() => {
+                      fetch("/api/dashboard/widget", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ storeId: store.id }) })
+                        .then(r => r.json()).then(d => { if (d.apiKey) { navigator.clipboard.writeText(d.apiKey); toast.success("API key copied!"); fetchStores(); } });
+                    }} className="text-xs text-lemon-green font-semibold hover:underline">Generate API Key</button>
+                  ) : null}
                   {store.url && <a href={store.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-gray-50 rounded-lg text-gray-400"><ExternalLink className="w-4 h-4" /></a>}
                 </div>
               </div>
