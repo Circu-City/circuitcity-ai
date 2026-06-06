@@ -15,6 +15,7 @@ const allNavItems = [
   { href: "/dashboard/api-keys", label: "API Keys", icon: Code },
   { href: "/dashboard/widget", label: "Chat Widget", icon: MessageSquare },
   { href: "/dashboard/conversations", label: "Conversations", icon: MessageSquare },
+  { href: "/dashboard/tickets", label: "Tickets", icon: MessageSquare },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/support", label: "Support", icon: HeadphonesIcon },
