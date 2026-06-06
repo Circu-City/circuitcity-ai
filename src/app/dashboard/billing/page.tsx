@@ -8,7 +8,7 @@ import { Check } from "lucide-react";
 
 const plans = [
   { id: "free", name: "Starter", price: "$0", features: ["1,000 messages/mo", "1 store", "Basic AI"] },
-  { id: "growth", name: "Growth", price: "$49", features: ["10,000 messages/mo", "3 stores", "Advanced AI", "Priority support"] },
+  { id: "pro", name: "Growth", price: "$49", features: ["10,000 messages/mo", "3 stores", "Advanced AI", "Priority support"] },
   { id: "enterprise", name: "Enterprise", price: "$199", features: ["Unlimited", "Dedicated manager", "Custom LLM"] },
 ];
 

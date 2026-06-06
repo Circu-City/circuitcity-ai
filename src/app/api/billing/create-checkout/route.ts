@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { plan } = await req.json();
-    const validPlans = ["free", "starter", "growth", "enterprise"];
+    const validPlans = ["free", "starter", "pro", "enterprise"];
     if (!plan || !validPlans.includes(plan)) return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
 
     let store = await prisma.store.findFirst({ where: { userId: session.userId } });

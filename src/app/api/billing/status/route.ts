@@ -11,8 +11,10 @@ export async function GET() {
     if (!store) return NextResponse.json({ plan: "free", status: "none" });
 
     const sub = await prisma.subscription.findFirst({ where: { storeId: store.id } });
+    const rawPlan = sub?.plan || "free";
+    const plan = rawPlan === "growth" ? "pro" : rawPlan === "pro" ? "pro" : rawPlan === "starter" ? "starter" : rawPlan === "enterprise" ? "enterprise" : "free";
     return NextResponse.json({
-      plan: sub?.plan || "free",
+      plan: plan,
       status: sub?.status || "active",
       currentPeriodEnd: sub?.currentPeriodEnd || null,
     });
