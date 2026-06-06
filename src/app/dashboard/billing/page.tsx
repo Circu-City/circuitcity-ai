@@ -29,13 +29,14 @@ export default function BillingPage() {
     try {
       const res = await fetch("/api/billing/create-checkout", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: planId }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
-      } else if (data.sandbox) {
+      } else if (data.success || data.sandbox) {
         const pname = plans.find(p => p.id === planId)?.name || planId;
         toast.success(`Upgraded to ${pname} plan!`);
         setCurrentPlan(planId);
