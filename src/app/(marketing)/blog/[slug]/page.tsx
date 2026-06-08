@@ -30,6 +30,8 @@ function renderContent(text: string) {
 export default function BlogPostPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/blog/${slug}`)
