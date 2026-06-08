@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-2xl font-bold text-dark-navy mb-3">5. Contact</h2>
-            <p>For questions about this Privacy Policy, contact our Data Protection Officer at privacy@circucity.se or at CircuCity AI, Stockholm, Sweden.</p>
+            <p>For questions about this Privacy Policy, contact our Data Protection Officer at privacy@circucity.se or at CircuCity AI, Skellefteå, Sweden.</p>
           </section>
         </div>
       </div>

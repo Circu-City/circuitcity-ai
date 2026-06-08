@@ -36,16 +36,17 @@ export default function SupportPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <a href="mailto:support@circucity.se" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 block hover:border-lemon-green transition-colors">
             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4"><Mail className="w-6 h-6 text-blue-600" /></div>
             <h3 className="font-semibold text-dark-navy mb-1">Email Support</h3>
             <p className="text-sm text-gray-500">support@circucity.se</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          </a>
+          <a href="/contact" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 block hover:border-lemon-green transition-colors">
             <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4"><MessageSquare className="w-6 h-6 text-green-600" /></div>
             <h3 className="font-semibold text-dark-navy mb-1">Live Chat</h3>
-            <p className="text-sm text-gray-500">Mon-Fri, 9am-6pm EST</p>
-          </div>
+            <p className="text-sm text-gray-500">Mon-Fri, 9:00-18:00 CET</p>
+            <p className="text-xs text-lemon-green mt-2 font-medium">Open Contact Form →</p>
+          </a>
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4"><BookOpen className="w-6 h-6 text-purple-600" /></div>
             <h3 className="font-semibold text-dark-navy mb-1">Documentation</h3>

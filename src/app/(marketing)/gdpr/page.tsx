@@ -13,7 +13,7 @@ export default function GdprPage() {
             <h2 className="text-2xl font-bold text-dark-navy mb-3">Key Measures</h2>
             <ul className="list-disc pl-5 space-y-2">
               <li>Data Processing Agreement (DPA) available for all customers</li>
-              <li>All data stored on EU-based servers (Stockholm, Sweden)</li>
+              <li>All data stored on EU-based servers (Skellefteå, Sweden)</li>
               <li>End-to-end encryption for data in transit and at rest</li>
               <li>Right to access, rectify, and delete personal data</li>
               <li>Data Protection Officer: dpo@circucity.se</li>
